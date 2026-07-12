@@ -1,0 +1,20 @@
+{
+  "name": "口算太空大冒险",
+  "short_name": "口算大冒险",
+  "description": "小学生数学口算闯关游戏，趣味练习1-6年级口算",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b1026",
+  "theme_color": "#0b1026",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='112' fill='%230b1026'/><text y='.92em' x='40' font-size='400'>🚀</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
