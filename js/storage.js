@@ -42,14 +42,19 @@
 
   function get() { return state; }
 
-  // 关卡是否解锁：第一关永远解锁，其余需前一关拿到 >=1 星
+  // 关卡是否解锁：每个年级(世界)的第一关直接开放，无需先通关低年级；
+  // 年级内部仍需前一关拿到 >=1 星才解锁下一关。
   function isUnlocked(levelId) {
-    const flat = global.Levels.flatLevels();
-    const idx = flat.findIndex(l => l.id === levelId);
-    if (idx <= 0) return true;
-    const prev = flat[idx - 1];
-    const rec = state.levels[prev.id];
-    return !!(rec && rec.stars >= 1);
+    const worlds = global.Levels.WORLDS;
+    for (const w of worlds) {
+      const idx = w.levels.findIndex(l => l.id === levelId);
+      if (idx === -1) continue;        // 不在这个年级里，继续找
+      if (idx === 0) return true;      // 每个年级第一关直接开放
+      const prev = w.levels[idx - 1];
+      const rec = state.levels[prev.id];
+      return !!(rec && rec.stars >= 1); // 年级内逐关解锁
+    }
+    return true;
   }
 
   function levelRecord(levelId) {

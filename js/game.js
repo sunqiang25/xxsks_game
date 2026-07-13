@@ -497,9 +497,16 @@
   }
 
   function getNextLevel(levelId) {
-    const flat = Levels.flatLevels();
-    const idx = flat.findIndex(l => l.id === levelId);
-    return (idx >= 0 && idx < flat.length - 1) ? flat[idx + 1] : null;
+    // 只在同一年级(世界)内找下一关；年级最后一关无“下一关”，引导回地图
+    for (const w of Levels.WORLDS) {
+      const idx = w.levels.findIndex(l => l.id === levelId);
+      if (idx === -1) continue;
+      if (idx < w.levels.length - 1) {
+        return Object.assign({ worldId: w.id }, w.levels[idx + 1]);
+      }
+      return null;
+    }
+    return null;
   }
 
   // ================= 徽章墙 =================

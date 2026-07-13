@@ -1,0 +1,1693 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1026">
+  <meta name="format-detection" content="telephone=no">
+  <!-- iOS 全屏/状态栏 -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="口算大冒险">
+  <title>🚀 口算太空大冒险</title>
+  <style>
+/* ===== 口算太空大冒险 · 太空主题 ===== */
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --bg1: #0b1026;
+  --bg2: #1a1147;
+  --accent: #ffd93d;
+  --accent2: #6bcbff;
+  --ok: #4ade80;
+  --no: #ff6b6b;
+  --card: rgba(255, 255, 255, 0.08);
+  --card-border: rgba(255, 255, 255, 0.16);
+  --text: #f4f6ff;
+  --muted: #a8b0d8;
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
+}
+
+html, body { height: 100%; }
+body {
+  font-family: "PingFang SC", "Microsoft YaHei", "Segoe UI", system-ui, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(1200px 800px at 80% -10%, #2a1a6e 0%, transparent 60%),
+    radial-gradient(900px 700px at 10% 110%, #1b2b6b 0%, transparent 55%),
+    linear-gradient(160deg, var(--bg1), var(--bg2));
+  background-attachment: fixed;
+  min-height: 100%;
+  overflow-x: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;      /* 禁止长按弹出菜单/选中 */
+  -webkit-text-size-adjust: 100%;   /* 禁止横竖屏文字缩放 */
+  text-size-adjust: 100%;
+  touch-action: manipulation;       /* 禁止双击缩放，点击更跟手 */
+  overscroll-behavior-y: contain;   /* 禁止下拉刷新/橡皮筋回弹 */
+}
+
+/* 星空背景 */
+body::before {
+  content: "";
+  position: fixed; inset: 0;
+  background-image:
+    radial-gradient(1.5px 1.5px at 20% 30%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 60% 70%, #fff, transparent),
+    radial-gradient(1px 1px at 80% 20%, #fff, transparent),
+    radial-gradient(1px 1px at 35% 85%, #fff, transparent),
+    radial-gradient(2px 2px at 90% 60%, #ffe, transparent),
+    radial-gradient(1px 1px at 45% 50%, #fff, transparent);
+  background-size: 100% 100%;
+  opacity: 0.5;
+  animation: twinkle 4s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 0;
+}
+@keyframes twinkle { from { opacity: 0.3; } to { opacity: 0.7; } }
+
+#app { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; padding-bottom: calc(40px + var(--safe-b)); }
+
+/* ===== 顶栏 ===== */
+.topbar {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px;
+  padding: calc(14px + var(--safe-t)) calc(16px + var(--safe-r)) 14px calc(16px + var(--safe-l));
+  background: rgba(11, 16, 38, 0.75);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--card-border);
+}
+.brand { font-size: 20px; font-weight: 800; letter-spacing: 0.5px; }
+.topbar-right { display: flex; align-items: center; gap: 8px; }
+.star-count {
+  background: linear-gradient(135deg, #ffd93d, #ff9d5c);
+  color: #3a2400; font-weight: 800; padding: 6px 12px; border-radius: 999px;
+  font-size: 14px; white-space: nowrap;
+}
+.icon-btn {
+  width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--card-border);
+  background: var(--card); color: var(--text); font-size: 18px; cursor: pointer;
+  transition: transform .1s, background .2s;
+}
+.icon-btn:hover { background: rgba(255,255,255,0.16); }
+.icon-btn:active { transform: scale(0.9); }
+
+/* ===== 地图 ===== */
+.map { padding: 18px 16px; display: flex; flex-direction: column; gap: 22px; }
+.world {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 22px; padding: 18px;
+  position: relative; overflow: hidden;
+}
+.world::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(400px 120px at 100% 0, var(--wc), transparent 70%);
+  opacity: 0.18; pointer-events: none;
+}
+.world-head { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+.world-emoji { font-size: 40px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4)); }
+.world-head h2 { font-size: 20px; }
+.world-head p { color: var(--muted); font-size: 13px; margin-top: 2px; }
+
+.nodes { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+.node {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 16px 10px; border-radius: 18px; cursor: pointer;
+  background: linear-gradient(160deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
+  border: 1px solid var(--card-border); color: var(--text);
+  transition: transform .12s, box-shadow .2s, border-color .2s;
+}
+.node:hover:not(.locked) {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+  border-color: var(--accent);
+}
+.node:active:not(.locked) { transform: scale(0.97); }
+.node.locked { opacity: 0.45; cursor: not-allowed; filter: grayscale(0.6); }
+.node.perfect { border-color: var(--accent); box-shadow: 0 0 18px rgba(255,217,61,0.35); }
+.node-emoji { font-size: 32px; }
+.node-name { font-size: 13px; font-weight: 600; text-align: center; }
+.node-stars { display: flex; gap: 2px; }
+.star { color: rgba(255,255,255,0.25); font-size: 15px; }
+.star.on { color: var(--accent); text-shadow: 0 0 8px rgba(255,217,61,0.7); }
+.lock { font-size: 15px; }
+
+.tip { text-align: center; color: var(--muted); font-size: 13px; padding: 10px 16px; }
+
+/* ===== 通用屏幕 / 卡片 ===== */
+.screen { min-height: 88vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.center { text-align: center; }
+.intro-card, .result-card {
+  background: var(--card); border: 1px solid var(--card-border);
+  border-radius: 26px; padding: 30px 26px; max-width: 460px; width: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+}
+.intro-emoji { font-size: 72px; margin-bottom: 6px; animation: float 3s ease-in-out infinite; }
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+.intro-card h1 { font-size: 26px; margin-bottom: 6px; }
+.intro-sub { color: var(--muted); margin-bottom: 14px; }
+.intro-stars { margin-bottom: 14px; font-size: 15px; }
+.intro-stars .star { font-size: 22px; }
+.best { color: var(--accent); font-weight: 700; margin-left: 6px; }
+
+/* 倒计时选择器 */
+.time-picker { margin-bottom: 16px; }
+.time-label { font-size: 14px; color: var(--muted); margin-bottom: 10px; font-weight: 600; }
+.time-opts { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.time-opt {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  min-width: 62px; padding: 8px 10px; border-radius: 14px; cursor: pointer;
+  background: rgba(255,255,255,0.08); border: 2px solid var(--card-border); color: var(--text);
+  font-size: 13px; font-weight: 700; font-family: inherit; transition: transform .1s, border-color .2s, background .2s;
+}
+.time-opt .time-emoji { font-size: 20px; }
+.time-opt:hover { background: rgba(255,255,255,0.16); }
+.time-opt:active { transform: scale(0.94); }
+.time-opt.active {
+  border-color: var(--accent); background: rgba(255,217,61,0.18);
+  box-shadow: 0 0 14px rgba(255,217,61,0.3);
+}
+
+.intro-rules {
+  background: rgba(255,255,255,0.06); border-radius: 14px; padding: 12px;
+  font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.6;
+}
+.intro-rules b { color: var(--accent); }
+.intro-btns { display: flex; flex-direction: column; gap: 10px; }
+
+/* ===== 按钮 ===== */
+.btn {
+  border: 1px solid var(--card-border); background: rgba(255,255,255,0.1);
+  color: var(--text); font-size: 16px; font-weight: 700; padding: 14px 20px;
+  border-radius: 16px; cursor: pointer; transition: transform .1s, background .2s, box-shadow .2s;
+  font-family: inherit;
+}
+.btn:hover { background: rgba(255,255,255,0.18); }
+.btn:active { transform: scale(0.96); }
+.btn.big { font-size: 18px; padding: 16px; }
+.btn.primary {
+  background: linear-gradient(135deg, #ffd93d, #ff9d5c); color: #3a2400; border: none;
+  box-shadow: 0 8px 20px rgba(255,157,92,0.4);
+}
+.btn.primary:hover { box-shadow: 0 10px 26px rgba(255,157,92,0.55); }
+.btn.ghost { background: transparent; }
+.btn.danger { background: rgba(255,107,107,0.18); border-color: rgba(255,107,107,0.4); color: #ffb4b4; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.menu-list { display: flex; flex-direction: column; gap: 10px; margin: 18px 0; }
+.version { color: var(--muted); font-size: 12px; margin-top: 16px; }
+
+/* ===== 答题区 ===== */
+.quiz { padding: 16px calc(16px + var(--safe-r)) calc(16px + var(--safe-b)) calc(16px + var(--safe-l)); max-width: 520px; margin: 0 auto; }
+.quiz-top { display: flex; align-items: center; gap: 12px; padding: 6px 0 14px; }
+.pbar { flex: 1; height: 12px; background: rgba(255,255,255,0.12); border-radius: 999px; overflow: hidden; }
+.pbar-fill { height: 100%; background: linear-gradient(90deg, #6bcbff, #4ade80); border-radius: 999px; transition: width .3s; }
+.qcount { font-weight: 700; color: var(--muted); font-size: 14px; min-width: 46px; text-align: right; }
+
+.combo-area { height: 40px; display: flex; align-items: center; justify-content: center; }
+
+/* 环形倒计时 */
+.timer { position: relative; width: 66px; height: 66px; margin: 0 auto 4px; }
+.timer-ring { width: 100%; height: 100%; transform: rotate(-90deg); }
+.timer-track { fill: none; stroke: rgba(255,255,255,0.12); stroke-width: 4; }
+.timer-arc {
+  fill: none; stroke: var(--accent2); stroke-width: 4; stroke-linecap: round;
+  transition: stroke-dashoffset .1s linear, stroke .3s;
+}
+.timer-num {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-size: 24px; font-weight: 800; color: var(--text);
+}
+.timer.danger .timer-arc { stroke: var(--no); }
+.timer.danger .timer-num { color: var(--no); animation: timerPulse .5s ease-in-out infinite; }
+@keyframes timerPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.25); } }
+
+.mode-tag {
+  display: inline-block; background: rgba(107,203,255,0.16); border: 1px solid rgba(107,203,255,0.35);
+  color: var(--accent2); font-size: 13px; font-weight: 700; padding: 5px 14px; border-radius: 999px; margin-bottom: 14px;
+}
+.timeout-note {
+  background: rgba(255,157,92,0.14); border: 1px solid rgba(255,157,92,0.3); color: #ffca9c;
+  font-size: 13px; padding: 10px; border-radius: 12px; margin-bottom: 14px;
+}
+.combo-badge {
+  background: linear-gradient(135deg, #ff6bcb, #ff9d5c); color: #fff;
+  font-weight: 800; padding: 6px 16px; border-radius: 999px; font-size: 16px;
+  box-shadow: 0 4px 16px rgba(255,107,203,0.5);
+}
+
+.question {
+  font-size: 44px; font-weight: 800; text-align: center; padding: 20px 10px 24px;
+  letter-spacing: 2px; text-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+/* 选择题 */
+.choices { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.choice {
+  display: flex; align-items: center; gap: 10px; justify-content: center;
+  padding: 20px; font-size: 24px; font-weight: 800; border-radius: 18px;
+  background: rgba(255,255,255,0.1); border: 2px solid var(--card-border); color: var(--text);
+  cursor: pointer; transition: transform .1s, background .2s, border-color .2s;
+  font-family: inherit;
+}
+.choice:hover:not(:disabled) { background: rgba(255,255,255,0.18); border-color: var(--accent2); }
+.choice:active:not(:disabled) { transform: scale(0.96); }
+.choice-key {
+  width: 30px; height: 30px; border-radius: 8px; background: rgba(255,255,255,0.15);
+  font-size: 15px; display: inline-flex; align-items: center; justify-content: center; color: var(--muted);
+}
+
+/* keypad */
+.answer-box { max-width: 340px; margin: 0 auto; }
+.answer-display {
+  min-height: 70px; border-radius: 18px; background: rgba(0,0,0,0.25);
+  border: 2px solid var(--card-border); display: flex; align-items: center; justify-content: center;
+  font-size: 40px; font-weight: 800; margin-bottom: 14px; letter-spacing: 2px;
+}
+.answer-display .placeholder { color: rgba(255,255,255,0.3); }
+.keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+.key {
+  padding: 18px 0; font-size: 24px; font-weight: 800; border-radius: 16px;
+  background: rgba(255,255,255,0.1); border: 1px solid var(--card-border); color: var(--text);
+  cursor: pointer; transition: transform .08s, background .15s; font-family: inherit;
+}
+.key:hover:not(:disabled) { background: rgba(255,255,255,0.2); }
+.key:active:not(:disabled) { transform: scale(0.92); background: var(--accent2); }
+.key.back { background: rgba(255,107,107,0.18); }
+.key.ghostkey { visibility: hidden; }
+
+/* 反馈 */
+.feedback { min-height: 60px; display: flex; align-items: center; justify-content: center; margin-top: 8px; }
+.fb { font-size: 20px; font-weight: 800; padding: 10px 20px; border-radius: 14px; }
+.fb.ok { color: var(--ok); background: rgba(74,222,128,0.14); }
+.fb.no { color: #ffb4b4; background: rgba(255,107,107,0.14); }
+.fb .bonus { color: var(--accent); }
+.correct-flash { animation: flashOk .5s; border-color: var(--ok) !important; }
+.wrong-flash { animation: flashNo .5s; border-color: var(--no) !important; }
+@keyframes flashOk { 0% { background: rgba(74,222,128,0.5); } 100% {} }
+@keyframes flashNo { 0% { background: rgba(255,107,107,0.5); } 100% {} }
+
+/* ===== 结算 ===== */
+.result-stars { font-size: 0; margin-bottom: 10px; height: 76px; }
+.bigstar {
+  font-size: 64px; color: rgba(255,255,255,0.2); margin: 0 2px; display: inline-block;
+  transform: scale(0) rotate(-40deg); font-style: normal;
+}
+.bigstar.on.drop { color: var(--accent); text-shadow: 0 0 24px rgba(255,217,61,0.8); animation: starDrop .5s cubic-bezier(.34,1.56,.64,1) forwards; }
+@keyframes starDrop { 0% { transform: scale(0) rotate(-40deg); } 60% { transform: scale(1.3) rotate(8deg); } 100% { transform: scale(1) rotate(0); } }
+.result-card h1 { font-size: 28px; margin-bottom: 16px; }
+.result-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+.result-stats div { background: rgba(255,255,255,0.07); border-radius: 14px; padding: 12px 4px; font-size: 12px; color: var(--muted); }
+.result-stats span { display: block; font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 2px; }
+.fast-medal { background: linear-gradient(135deg,#6bcbff,#4ade80); color:#04321f; font-weight:800; padding:10px; border-radius:14px; margin-bottom:14px; }
+.earned-badges { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 14px; }
+.earned { background: linear-gradient(135deg,#ffd93d,#ff9d5c); color:#3a2400; font-weight:800; padding:8px 14px; border-radius:999px; font-size:14px; }
+.wrong-review { text-align: left; background: rgba(255,255,255,0.06); border-radius: 14px; padding: 4px 14px; margin-bottom: 16px; }
+.wrong-review summary { cursor: pointer; padding: 10px 0; font-weight: 700; color: #ffb4b4; }
+.wrong-row { padding: 6px 0; border-top: 1px solid var(--card-border); font-size: 15px; }
+.wrong-row b { color: var(--ok); }
+.all-correct { color: var(--ok); font-weight: 700; margin-bottom: 16px; }
+
+/* ===== 徽章墙 ===== */
+.badge-wall { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px,1fr)); gap: 14px; padding: 20px 16px; }
+.badge-card {
+  background: var(--card); border: 1px solid var(--card-border); border-radius: 18px;
+  padding: 18px 8px; text-align: center; opacity: 0.55; filter: grayscale(0.7);
+  transition: transform .2s;
+}
+.badge-card.owned { opacity: 1; filter: none; border-color: var(--accent); box-shadow: 0 0 16px rgba(255,217,61,0.25); }
+.badge-card.owned:hover { transform: translateY(-4px) scale(1.05); }
+.badge-emoji { font-size: 40px; margin-bottom: 8px; }
+.badge-name { font-size: 13px; font-weight: 700; }
+.weak-tip { margin: 0 16px 14px; background: rgba(107,203,255,0.14); border:1px solid rgba(107,203,255,0.3); border-radius:14px; padding:14px; font-size:14px; line-height:1.6; }
+.weak-tip b { color: var(--accent2); }
+.stat-summary { text-align: center; color: var(--muted); padding: 0 16px 20px; }
+.stat-summary b { color: var(--accent); font-size: 18px; }
+
+/* ===== 特效层 ===== */
+.fx-layer { position: fixed; inset: 0; pointer-events: none; z-index: 50; overflow: hidden; }
+.fx-star { position: absolute; font-size: 28px; animation: flyStar .9s ease-out forwards; }
+@keyframes flyStar {
+  0% { transform: translate(0,0) scale(0.5); opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(1.4) rotate(40deg); opacity: 0; }
+}
+.confetti {
+  position: absolute; top: -20px; width: 10px; height: 14px; border-radius: 2px;
+  animation: fall 2s linear forwards;
+}
+@keyframes fall {
+  0% { transform: translateY(-20px) rotate(0); opacity: 1; }
+  100% { transform: translateY(105vh) rotate(var(--rot)); opacity: 0.4; }
+}
+.badge-toast {
+  position: fixed; top: 76px; left: 50%; transform: translateX(-50%);
+  background: linear-gradient(135deg,#ffd93d,#ff9d5c); color:#3a2400; font-weight:800;
+  padding: 12px 22px; border-radius: 999px; z-index: 60; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  transition: opacity .5s, transform .5s;
+}
+.badge-toast.out { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+
+/* ===== 通用动画 ===== */
+.pop { animation: pop .35s cubic-bezier(.34,1.56,.64,1); }
+@keyframes pop { 0% { transform: scale(0.7); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+.shake { animation: shake .4s; }
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20% { transform: translateX(-10px); } 40% { transform: translateX(10px); }
+  60% { transform: translateX(-7px); } 80% { transform: translateX(7px); }
+}
+
+/* ===== 响应式 ===== */
+@media (max-width: 480px) {
+  .brand { font-size: 16px; }
+  .map { padding: 14px 12px; gap: 16px; }
+  .world { padding: 14px; border-radius: 18px; }
+  .nodes { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .question { font-size: 34px; padding: 14px 8px 18px; }
+  .choices { gap: 10px; }
+  .choice { font-size: 20px; padding: 16px; min-height: 60px; }
+  .key { padding: 16px 0; font-size: 22px; }
+  .answer-display { min-height: 60px; font-size: 34px; }
+  .result-stats { gap: 8px; }
+  .result-stats div { padding: 10px 2px; }
+  .result-stats span { font-size: 18px; }
+  .bigstar { font-size: 52px; }
+  .intro-card, .result-card { padding: 24px 18px; border-radius: 22px; }
+  .intro-emoji { font-size: 60px; }
+  .badge-wall { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+}
+
+/* 超小屏（老款/小屏手机） */
+@media (max-width: 340px) {
+  .nodes { grid-template-columns: 1fr; }
+  .question { font-size: 30px; }
+  .key { padding: 14px 0; font-size: 20px; }
+}
+
+/* 横屏：压缩纵向空间，答题区左右分栏更好按 */
+@media (orientation: landscape) and (max-height: 500px) {
+  .screen { min-height: auto; padding: 12px; }
+  .intro-emoji { font-size: 44px; margin-bottom: 0; animation: none; }
+  .intro-card h1, .result-card h1 { font-size: 20px; }
+  .question { font-size: 32px; padding: 8px; }
+  .combo-area { height: 28px; }
+  .keypad { max-width: 300px; margin: 0 auto 10px; }
+  .answer-display { min-height: 48px; font-size: 30px; }
+  .feedback { min-height: 40px; }
+  .bigstar { font-size: 40px; }
+  .result-stars { height: 50px; }
+}
+
+/* 支持动态视口高度的浏览器：用 dvh 避免手机地址栏遮挡 */
+@supports (height: 100dvh) {
+  .screen { min-height: 88dvh; }
+}
+
+/* 尊重“减少动画”偏好 */
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+  body::before { animation: none; }
+}
+
+</style>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230b1026'/><text y='.9em' x='6' font-size='78'>🚀</text></svg>">
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+// 题目生成器：按知识点生成口算题
+// 每道题格式：
+//   keypad 模式  { text, answer:Number, inputMode:'keypad', decimals }
+//   choice 模式  { text, answer:String, inputMode:'choice', options:[...] }
+
+(function (global) {
+  'use strict';
+
+  function randInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+  function pick(arr) {
+    return arr[randInt(0, arr.length - 1)];
+  }
+  function gcd(a, b) {
+    a = Math.abs(a); b = Math.abs(b);
+    while (b) { [a, b] = [b, a % b]; }
+    return a || 1;
+  }
+  function simplifyFrac(n, d) {
+    const g = gcd(n, d);
+    return [n / g, d / g];
+  }
+  function fracStr(n, d) {
+    if (d === 1) return String(n);
+    if (n === 0) return '0';
+    return n + '/' + d;
+  }
+
+  function kq(text, answer, decimals) {
+    return { text: text, answer: Number(answer), inputMode: 'keypad', decimals: decimals || 0 };
+  }
+  function cq(text, answer, options) {
+    return { text: text, answer: String(answer), inputMode: 'choice', options: options };
+  }
+
+  // 从候选干扰项里拼出 4 个不重复选项（含正确答案），并打乱
+  // makeMore(k): 可选兜底函数，去重后不足 4 个时反复调用以补足
+  function buildOptions(correct, distractors, makeMore) {
+    const set = [String(correct)];
+    const pushUnique = (v) => {
+      const s = String(v);
+      if (set.length < 4 && !set.includes(s)) set.push(s);
+    };
+    for (const d of distractors) {
+      if (set.length >= 4) break;
+      pushUnique(d);
+    }
+    let guard = 0;
+    while (set.length < 4 && typeof makeMore === 'function' && guard < 60) {
+      guard++;
+      pushUnique(makeMore(guard));
+    }
+    // 打乱
+    for (let i = set.length - 1; i > 0; i--) {
+      const j = randInt(0, i);
+      [set[i], set[j]] = [set[j], set[i]];
+    }
+    return set;
+  }
+
+  // ---------- 各知识点生成器 ----------
+  const GEN = {
+    // 一年级
+    add10() {
+      const a = randInt(1, 9);
+      const b = randInt(0, 10 - a);
+      return kq(a + ' + ' + b, a + b);
+    },
+    sub10() {
+      const a = randInt(1, 10);
+      const b = randInt(0, a);
+      return kq(a + ' − ' + b, a - b);
+    },
+    add20() { // 进位加法，和在 11~18
+      let a, b;
+      do { a = randInt(3, 9); b = randInt(3, 9); } while (a + b < 11 || a + b > 18);
+      return kq(a + ' + ' + b, a + b);
+    },
+    sub20() { // 退位减法
+      let a, b;
+      do { a = randInt(11, 18); b = randInt(2, 9); } while (a - b < 1 || (a % 10) >= b);
+      return kq(a + ' − ' + b, a - b);
+    },
+
+    // 二年级
+    add100() {
+      const a = randInt(10, 89);
+      const b = randInt(10, 100 - a);
+      return kq(a + ' + ' + b, a + b);
+    },
+    sub100() {
+      const a = randInt(20, 99);
+      const b = randInt(10, a - 1);
+      return kq(a + ' − ' + b, a - b);
+    },
+    mulTable() { // 乘法口诀
+      const a = randInt(2, 9);
+      const b = randInt(2, 9);
+      return kq(a + ' × ' + b, a * b);
+    },
+    divTable() { // 表内除法
+      const b = randInt(2, 9);
+      const q = randInt(2, 9);
+      return kq((b * q) + ' ÷ ' + b, q);
+    },
+
+    // 三年级
+    addSub3() { // 三位数加减
+      if (randInt(0, 1)) {
+        const a = randInt(100, 800);
+        const b = randInt(100, 999 - a > 100 ? 999 - a : 100);
+        return kq(a + ' + ' + b, a + b);
+      }
+      const a = randInt(300, 999);
+      const b = randInt(100, a - 50);
+      return kq(a + ' − ' + b, a - b);
+    },
+    mul1by2() { // 一位数 × 两位数
+      const a = randInt(2, 9);
+      const b = randInt(11, 99);
+      return kq(a + ' × ' + b, a * b);
+    },
+    divExact3() { // 两三位数 ÷ 一位数（整除）
+      const d = randInt(2, 9);
+      const q = randInt(11, 99);
+      return kq((d * q) + ' ÷ ' + d, q);
+    },
+
+    // 四年级
+    mul2by2() {
+      const a = randInt(11, 99);
+      const b = randInt(11, 99);
+      return kq(a + ' × ' + b, a * b);
+    },
+    mul3by1() {
+      const a = randInt(100, 999);
+      const b = randInt(2, 9);
+      return kq(a + ' × ' + b, a * b);
+    },
+    divByTwo() { // 除数是两位数（整除）
+      const d = randInt(11, 30);
+      const q = randInt(2, 30);
+      return kq((d * q) + ' ÷ ' + d, q);
+    },
+    mixed4() { // 简单四则混合
+      const forms = [
+        () => { const a = randInt(2, 9), b = randInt(2, 9), c = randInt(2, 20); return kq(a + ' × ' + b + ' + ' + c, a * b + c); },
+        () => { const a = randInt(2, 9), b = randInt(2, 9), c = randInt(1, 10); return kq(a + ' × ' + b + ' − ' + c, a * b - c); },
+        () => { const a = randInt(2, 20), b = randInt(2, 20), c = randInt(2, 9); return kq('(' + a + ' + ' + b + ') × ' + c, (a + b) * c); },
+        () => { const a = randInt(10, 50), b = randInt(2, 9), c = randInt(2, 9); return kq(a + ' + ' + b + ' × ' + c, a + b * c); }
+      ];
+      return pick(forms)();
+    },
+
+    // 五年级
+    decAddSub() { // 一位小数加减
+      const a = randInt(11, 99) / 10;
+      let b = randInt(11, 99) / 10;
+      if (randInt(0, 1)) {
+        return kq(a.toFixed(1) + ' + ' + b.toFixed(1), Math.round((a + b) * 10) / 10, 1);
+      }
+      const big = Math.max(a, b), small = Math.min(a, b);
+      return kq(big.toFixed(1) + ' − ' + small.toFixed(1), Math.round((big - small) * 10) / 10, 1);
+    },
+    decMul() { // 小数 × 整数
+      const a = randInt(11, 99) / 10;
+      const b = randInt(2, 9);
+      return kq(a.toFixed(1) + ' × ' + b, Math.round(a * b * 10) / 10, 1);
+    },
+    fracSameDenom() { // 同分母分数加减（选择）
+      const d = randInt(3, 9);
+      if (randInt(0, 1)) {
+        const n1 = randInt(1, d - 2);
+        const n2 = randInt(1, d - 1 - n1);
+        const ans = fracStr(n1 + n2, d);
+        const opts = buildOptions(ans, [
+          fracStr(n1 + n2, d + d),
+          fracStr(n1 + n2 + 1, d),
+          fracStr(n1 * n2, d)
+        ], (k) => fracStr(Math.max(1, n1 + n2 + (k % 2 ? k : -k)), d));
+        return cq(fracStr(n1, d) + ' + ' + fracStr(n2, d), ans, opts);
+      }
+      const n1 = randInt(2, d - 1);
+      const n2 = randInt(1, n1 - 1);
+      const ans = fracStr(n1 - n2, d);
+      const opts = buildOptions(ans, [
+        fracStr(n1 - n2, d + d),
+        fracStr(n1 - n2 + 1, d),
+        fracStr(n1 + n2, d)
+      ], (k) => fracStr(Math.max(1, (n1 - n2) + (k % 2 ? k : -k)), d));
+      return cq(fracStr(n1, d) + ' − ' + fracStr(n2, d), ans, opts);
+    },
+
+    // 六年级
+    fracMul() { // 真分数乘法（选择）
+      const b = randInt(2, 6), d = randInt(2, 6);
+      const a = randInt(1, b - 1), c = randInt(1, d - 1); // 真分数，分子<分母
+      const [sn, sd] = simplifyFrac(a * c, b * d);
+      const ans = fracStr(sn, sd);
+      const opts = buildOptions(ans, [
+        fracStr(a * c, b * d),
+        fracStr(a + c, b + d),
+        fracStr(a * d, b * c)
+      ], (k) => fracStr(a * c + k, b * d));
+      return cq(fracStr(a, b) + ' × ' + fracStr(c, d), ans, opts);
+    },
+    percent() { // 百分数（keypad，答案为整数）
+      const pct = pick([10, 20, 25, 50, 5]);
+      const base = randInt(1, 10) * 20;
+      return kq(base + ' 的 ' + pct + '% ', base * pct / 100);
+    },
+    mixedAdv() { // 综合混合运算
+      const forms = [
+        () => { const a = randInt(3, 12), b = randInt(3, 12), c = randInt(3, 12), d = randInt(2, 9); return kq(a + ' × ' + b + ' + ' + c + ' × ' + d, a * b + c * d); },
+        () => { const a = randInt(20, 80), b = randInt(3, 9), c = randInt(3, 9); return kq(a + ' + ' + b + ' × ' + c, a + b * c); },
+        () => { const a = randInt(2, 12), b = randInt(2, 12), c = randInt(2, 9); return kq(a + ' × (' + b + ' + ' + c + ')', a * (b + c)); },
+        () => { const c = randInt(2, 9), q = randInt(3, 20), r = randInt(1, 30); return kq((c * q) + ' ÷ ' + c + ' + ' + r, q + r); }
+      ];
+      return pick(forms)();
+    }
+  };
+
+  // 生成一关的题目，尽量避免连续重复
+  function generate(type, count) {
+    const gen = GEN[type];
+    if (!gen) throw new Error('未知题型: ' + type);
+    const out = [];
+    const recent = [];
+    let guard = 0;
+    while (out.length < count && guard < count * 30) {
+      guard++;
+      const item = gen();
+      if (recent.includes(item.text)) continue;
+      recent.push(item.text);
+      if (recent.length > 3) recent.shift();
+      out.push(item);
+    }
+    while (out.length < count) out.push(gen()); // 兜底
+    return out;
+  }
+
+  global.Questions = { generate: generate, TYPES: Object.keys(GEN) };
+})(window);
+
+
+/* ==================== */
+
+// 关卡配置：星区(world) -> 关卡(level)
+// 每关: id, name, type(对应 questions.js 的题型), count, emoji, star 目标
+// 三星标准：accuracy(正确率) + avgTime(平均每题秒数)
+
+(function (global) {
+  'use strict';
+
+  const WORLDS = [
+    {
+      id: 'w1', grade: '一年级', name: '月球基地', emoji: '🌙', color: '#8ec5ff',
+      desc: '10~20以内的加减法',
+      levels: [
+        { id: 'w1l1', name: '10以内加法', type: 'add10', count: 10, emoji: '🚀' },
+        { id: 'w1l2', name: '10以内减法', type: 'sub10', count: 10, emoji: '🛰️' },
+        { id: 'w1l3', name: '20以内进位加', type: 'add20', count: 10, emoji: '⭐' },
+        { id: 'w1l4', name: '20以内退位减', type: 'sub20', count: 10, emoji: '🌟' }
+      ]
+    },
+    {
+      id: 'w2', grade: '二年级', name: '火星矿场', emoji: '🔴', color: '#ff9d6c',
+      desc: '100以内加减 + 乘法口诀',
+      levels: [
+        { id: 'w2l1', name: '100以内加法', type: 'add100', count: 10, emoji: '⛏️' },
+        { id: 'w2l2', name: '100以内减法', type: 'sub100', count: 10, emoji: '🪨' },
+        { id: 'w2l3', name: '乘法口诀', type: 'mulTable', count: 12, emoji: '✖️' },
+        { id: 'w2l4', name: '表内除法', type: 'divTable', count: 12, emoji: '➗' }
+      ]
+    },
+    {
+      id: 'w3', grade: '三年级', name: '木星风暴', emoji: '🟠', color: '#ffd36c',
+      desc: '三位数加减 + 一位数乘除',
+      levels: [
+        { id: 'w3l1', name: '三位数加减', type: 'addSub3', count: 10, emoji: '🌀' },
+        { id: 'w3l2', name: '一位×两位数', type: 'mul1by2', count: 10, emoji: '⚡' },
+        { id: 'w3l3', name: '除以一位数', type: 'divExact3', count: 10, emoji: '🌩️' }
+      ]
+    },
+    {
+      id: 'w4', grade: '四年级', name: '土星光环', emoji: '🪐', color: '#c9a0ff',
+      desc: '多位数乘除 + 四则混合',
+      levels: [
+        { id: 'w4l1', name: '两位×两位数', type: 'mul2by2', count: 8, emoji: '💫' },
+        { id: 'w4l2', name: '三位×一位数', type: 'mul3by1', count: 8, emoji: '🔮' },
+        { id: 'w4l3', name: '除以两位数', type: 'divByTwo', count: 8, emoji: '🌌' },
+        { id: 'w4l4', name: '四则混合', type: 'mixed4', count: 8, emoji: '🎯' }
+      ]
+    },
+    {
+      id: 'w5', grade: '五年级', name: '海王星海', emoji: '🔵', color: '#6cc6ff',
+      desc: '小数运算 + 同分母分数',
+      levels: [
+        { id: 'w5l1', name: '小数加减', type: 'decAddSub', count: 10, emoji: '💧' },
+        { id: 'w5l2', name: '小数乘法', type: 'decMul', count: 8, emoji: '🌊' },
+        { id: 'w5l3', name: '同分母分数', type: 'fracSameDenom', count: 8, emoji: '❄️' }
+      ]
+    },
+    {
+      id: 'w6', grade: '六年级', name: '深空星云', emoji: '🌌', color: '#ff7eb6',
+      desc: '分数乘法 + 百分数 + 综合',
+      levels: [
+        { id: 'w6l1', name: '分数乘法', type: 'fracMul', count: 8, emoji: '🌠' },
+        { id: 'w6l2', name: '百分数', type: 'percent', count: 8, emoji: '💠' },
+        { id: 'w6l3', name: '综合运算', type: 'mixedAdv', count: 8, emoji: '👑' }
+      ]
+    }
+  ];
+
+  // 三星评价标准（对所有关卡通用）：
+  // 3星: 正确率 100%
+  // 2星: 正确率 >= 80%
+  // 1星: 通关(正确率 >= 60%)
+  // 额外“速度奖章”：平均每题 <= FAST_SEC 秒
+  const STAR_RULES = { three: 1.0, two: 0.8, one: 0.6 };
+  const FAST_SEC = 6;
+
+  function starsFor(accuracy) {
+    if (accuracy >= STAR_RULES.three) return 3;
+    if (accuracy >= STAR_RULES.two) return 2;
+    if (accuracy >= STAR_RULES.one) return 1;
+    return 0;
+  }
+
+  // 所有关卡按解锁顺序展开（跨星区连续解锁）
+  function flatLevels() {
+    const out = [];
+    WORLDS.forEach(w => w.levels.forEach(l => out.push(Object.assign({ worldId: w.id }, l))));
+    return out;
+  }
+
+  function findLevel(levelId) {
+    for (const w of WORLDS) {
+      for (const l of w.levels) {
+        if (l.id === levelId) return Object.assign({ worldId: w.id, worldName: w.name }, l);
+      }
+    }
+    return null;
+  }
+
+  global.Levels = {
+    WORLDS: WORLDS,
+    FAST_SEC: FAST_SEC,
+    starsFor: starsFor,
+    flatLevels: flatLevels,
+    findLevel: findLevel
+  };
+})(window);
+
+
+/* ==================== */
+
+// 进度存储：localStorage 持久化
+// 存储结构：
+// {
+//   levels: { [levelId]: { stars, best, fast, plays } },
+//   badges: [ 'first_win', 'combo10', ... ],
+//   stats:  { totalCorrect, totalWrong, byType: { [type]:{correct,wrong} } },
+//   settings: { sound: true, theme: 'space' }
+// }
+
+(function (global) {
+  'use strict';
+
+  const KEY = 'mathQuestGame_v1';
+
+  const DEFAULT = {
+    levels: {},
+    badges: [],
+    stats: { totalCorrect: 0, totalWrong: 0, byType: {} },
+    settings: { sound: true, theme: 'space', timeLimit: 0 }
+  };
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return JSON.parse(JSON.stringify(DEFAULT));
+      const data = JSON.parse(raw);
+      // 合并默认字段，防止旧存档缺字段
+      return Object.assign(JSON.parse(JSON.stringify(DEFAULT)), data, {
+        settings: Object.assign({}, DEFAULT.settings, data.settings || {}),
+        stats: Object.assign({}, DEFAULT.stats, data.stats || {})
+      });
+    } catch (e) {
+      return JSON.parse(JSON.stringify(DEFAULT));
+    }
+  }
+
+  let state = load();
+
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* 隐私模式忽略 */ }
+  }
+
+  function get() { return state; }
+
+  // 关卡是否解锁：每个年级(世界)的第一关直接开放，无需先通关低年级；
+  // 年级内部仍需前一关拿到 >=1 星才解锁下一关。
+  function isUnlocked(levelId) {
+    const worlds = global.Levels.WORLDS;
+    for (const w of worlds) {
+      const idx = w.levels.findIndex(l => l.id === levelId);
+      if (idx === -1) continue;        // 不在这个年级里，继续找
+      if (idx === 0) return true;      // 每个年级第一关直接开放
+      const prev = w.levels[idx - 1];
+      const rec = state.levels[prev.id];
+      return !!(rec && rec.stars >= 1); // 年级内逐关解锁
+    }
+    return true;
+  }
+
+  function levelRecord(levelId) {
+    return state.levels[levelId] || { stars: 0, best: 0, fast: false, plays: 0 };
+  }
+
+  // 记录一次通关结果，返回 { newStars, improved, newBadges }
+  function recordResult(levelId, type, correct, total, avgSec) {
+    const accuracy = total > 0 ? correct / total : 0;
+    const stars = global.Levels.starsFor(accuracy);
+    const prev = levelRecord(levelId);
+    const score = Math.round(accuracy * 100);
+
+    const rec = {
+      stars: Math.max(prev.stars, stars),
+      best: Math.max(prev.best, score),
+      fast: prev.fast || (avgSec <= global.Levels.FAST_SEC && accuracy >= 0.8),
+      plays: prev.plays + 1
+    };
+    const improved = stars > prev.stars || score > prev.best;
+    state.levels[levelId] = rec;
+
+    // 统计
+    state.stats.totalCorrect += correct;
+    state.stats.totalWrong += (total - correct);
+    if (!state.stats.byType[type]) state.stats.byType[type] = { correct: 0, wrong: 0 };
+    state.stats.byType[type].correct += correct;
+    state.stats.byType[type].wrong += (total - correct);
+
+    const newBadges = checkBadges();
+    save();
+    return { newStars: stars, storedStars: rec.stars, improved: improved, newBadges: newBadges, fast: rec.fast };
+  }
+
+  // 徽章检查
+  const BADGE_DEFS = [
+    { id: 'first_win', name: '首次通关', emoji: '🎖️', test: s => totalStars() >= 1 },
+    { id: 'stars10', name: '集星达人', emoji: '⭐', test: s => totalStars() >= 10 },
+    { id: 'stars30', name: '星光闪耀', emoji: '🌟', test: s => totalStars() >= 30 },
+    { id: 'stars_all', name: '宇宙之王', emoji: '👑', test: s => totalStars() >= maxStars() },
+    { id: 'w1_clear', name: '月球毕业', emoji: '🌙', test: s => worldCleared('w1') },
+    { id: 'w2_clear', name: '火星毕业', emoji: '🔴', test: s => worldCleared('w2') },
+    { id: 'perfect5', name: '五连满星', emoji: '💯', test: s => perfectCount() >= 5 }
+  ];
+
+  function totalStars() {
+    return Object.values(state.levels).reduce((sum, r) => sum + (r.stars || 0), 0);
+  }
+  function maxStars() {
+    return global.Levels.flatLevels().length * 3;
+  }
+  function perfectCount() {
+    return Object.values(state.levels).filter(r => r.stars === 3).length;
+  }
+  function worldCleared(worldId) {
+    const w = global.Levels.WORLDS.find(x => x.id === worldId);
+    if (!w) return false;
+    return w.levels.every(l => (state.levels[l.id] && state.levels[l.id].stars >= 1));
+  }
+
+  function checkBadges() {
+    const earned = [];
+    for (const b of BADGE_DEFS) {
+      if (!state.badges.includes(b.id) && b.test(state)) {
+        state.badges.push(b.id);
+        earned.push(b);
+      }
+    }
+    return earned;
+  }
+
+  // combo 徽章（答题过程中触发）
+  function grantComboBadge(combo) {
+    const earned = [];
+    if (combo >= 10 && !state.badges.includes('combo10')) {
+      state.badges.push('combo10');
+      earned.push({ id: 'combo10', name: '十连击', emoji: '🔥' });
+      save();
+    }
+    return earned;
+  }
+
+  function badgeDefs() { return BADGE_DEFS.concat([{ id: 'combo10', name: '十连击', emoji: '🔥' }]); }
+  function hasBadge(id) { return state.badges.includes(id); }
+
+  // 找出最薄弱的题型（错误率最高，且做过 >=5 题）
+  function weakestType() {
+    let worst = null, worstRate = -1;
+    for (const [type, rec] of Object.entries(state.stats.byType)) {
+      const total = rec.correct + rec.wrong;
+      if (total < 5) continue;
+      const rate = rec.wrong / total;
+      if (rate > worstRate && rate > 0) { worstRate = rate; worst = type; }
+    }
+    return worst ? { type: worst, wrongRate: worstRate } : null;
+  }
+
+  function setSetting(key, value) {
+    state.settings[key] = value;
+    save();
+  }
+
+  function reset() {
+    state = JSON.parse(JSON.stringify(DEFAULT));
+    save();
+  }
+
+  global.Store = {
+    get: get,
+    save: save,
+    isUnlocked: isUnlocked,
+    levelRecord: levelRecord,
+    recordResult: recordResult,
+    grantComboBadge: grantComboBadge,
+    badgeDefs: badgeDefs,
+    hasBadge: hasBadge,
+    totalStars: totalStars,
+    maxStars: maxStars,
+    weakestType: weakestType,
+    worldCleared: worldCleared,
+    setSetting: setSetting,
+    reset: reset
+  };
+})(window);
+
+
+/* ==================== */
+
+// 音效：WebAudio 合成，无需任何音频文件
+(function (global) {
+  'use strict';
+
+  let ctx = null;
+  function ac() {
+    if (!ctx) {
+      const AC = global.AudioContext || global.webkitAudioContext;
+      if (AC) ctx = new AC();
+    }
+    return ctx;
+  }
+
+  function enabled() {
+    return global.Store ? global.Store.get().settings.sound : true;
+  }
+
+  // 播放一个音符
+  function tone(freq, start, dur, type, gain) {
+    const c = ac();
+    if (!c) return;
+    const osc = c.createOscillator();
+    const g = c.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.value = freq;
+    const t0 = c.currentTime + start;
+    g.gain.setValueAtTime(0, t0);
+    g.gain.linearRampToValueAtTime(gain || 0.2, t0 + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.001, t0 + dur);
+    osc.connect(g).connect(c.destination);
+    osc.start(t0);
+    osc.stop(t0 + dur + 0.02);
+  }
+
+  function seq(notes) { // notes: [{f,d,t}]
+    if (!enabled()) return;
+    const c = ac();
+    if (!c) return;
+    if (c.state === 'suspended') c.resume();
+    let acc = 0;
+    notes.forEach(n => {
+      tone(n.f, acc, n.d, n.type, n.g);
+      acc += (n.step != null ? n.step : n.d);
+    });
+  }
+
+  const SFX = {
+    correct() { seq([{ f: 660, d: 0.12 }, { f: 880, d: 0.16 }]); },
+    combo(level) { // 连对越高音越亮
+      const base = 660 + Math.min(level, 8) * 40;
+      seq([{ f: base, d: 0.1 }, { f: base * 1.25, d: 0.12 }, { f: base * 1.5, d: 0.14 }]);
+    },
+    wrong() { seq([{ f: 300, d: 0.18, type: 'triangle' }, { f: 200, d: 0.22, type: 'triangle' }]); },
+    tick() { seq([{ f: 880, d: 0.06, type: 'square', g: 0.14 }]); },
+    click() { seq([{ f: 520, d: 0.05, g: 0.12 }]); },
+    win() { seq([{ f: 523, d: 0.14 }, { f: 659, d: 0.14 }, { f: 784, d: 0.14 }, { f: 1047, d: 0.3 }]); },
+    star() { seq([{ f: 988, d: 0.1 }, { f: 1319, d: 0.18 }]); },
+    badge() { seq([{ f: 784, d: 0.12 }, { f: 988, d: 0.12 }, { f: 1319, d: 0.25 }]); }
+  };
+
+  // 用户首次交互时唤醒音频上下文（浏览器策略）
+  function unlock() {
+    const c = ac();
+    if (c && c.state === 'suspended') c.resume();
+  }
+
+  global.Sound = { SFX: SFX, unlock: unlock };
+})(window);
+
+
+/* ==================== */
+
+// 游戏主逻辑：屏幕切换、地图、答题、结算
+(function (global) {
+  'use strict';
+
+  const $ = (sel, root) => (root || document).querySelector(sel);
+  const $$ = (sel, root) => Array.from((root || document).querySelectorAll(sel));
+  const app = () => $('#app');
+
+  // 当前答题会话
+  let session = null;
+
+  // ---------- 屏幕切换 ----------
+  function show(html) {
+    const root = app();
+    root.innerHTML = html;
+    root.scrollTop = 0;
+  }
+
+  function emojiStars(n) {
+    return '★★★'.slice(0, n).padEnd(3, '☆');
+  }
+
+  // ================= 主菜单 / 地图 =================
+  function renderMap() {
+    stopTimer();
+    session = null;
+    const total = Store.totalStars();
+    const max = Store.maxStars();
+    let worldsHtml = '';
+
+    Levels.WORLDS.forEach(w => {
+      let levelsHtml = '';
+      w.levels.forEach(l => {
+        const unlocked = Store.isUnlocked(l.id);
+        const rec = Store.levelRecord(l.id);
+        const stars = rec.stars || 0;
+        const cls = 'node' + (unlocked ? '' : ' locked') + (stars === 3 ? ' perfect' : '');
+        const starHtml = unlocked
+          ? '<span class="node-stars">' + renderStarIcons(stars) + '</span>'
+          : '<span class="lock">🔒</span>';
+        levelsHtml +=
+          '<button class="' + cls + '" ' + (unlocked ? '' : 'disabled') +
+          ' data-level="' + l.id + '" title="' + l.name + '">' +
+            '<span class="node-emoji">' + (unlocked ? l.emoji : '🔒') + '</span>' +
+            '<span class="node-name">' + l.name + '</span>' +
+            starHtml +
+          '</button>';
+      });
+      worldsHtml +=
+        '<section class="world" style="--wc:' + w.color + '">' +
+          '<div class="world-head">' +
+            '<span class="world-emoji">' + w.emoji + '</span>' +
+            '<div><h2>' + w.name + '</h2><p>' + w.grade + ' · ' + w.desc + '</p></div>' +
+          '</div>' +
+          '<div class="nodes">' + levelsHtml + '</div>' +
+        '</section>';
+    });
+
+    show(
+      '<header class="topbar">' +
+        '<div class="brand">🚀 口算太空大冒险</div>' +
+        '<div class="topbar-right">' +
+          '<span class="star-count">⭐ ' + total + ' / ' + max + '</span>' +
+          '<button class="icon-btn" id="btnBadges" title="徽章墙">🏅</button>' +
+          '<button class="icon-btn" id="btnSound" title="音效开关">' + (Store.get().settings.sound ? '🔊' : '🔇') + '</button>' +
+          '<button class="icon-btn" id="btnMenu" title="更多">⚙️</button>' +
+        '</div>' +
+      '</header>' +
+      '<div class="map">' + worldsHtml + '</div>' +
+      '<footer class="tip">💡 小提示：连续答对可以触发连击加分哦！</footer>'
+    );
+
+    $$('.node:not(.locked)').forEach(btn => {
+      btn.addEventListener('click', () => {
+        Sound.unlock();
+        Sound.SFX.click();
+        renderLevelIntro(btn.dataset.level);
+      });
+    });
+    $('#btnBadges').addEventListener('click', () => { Sound.SFX.click(); renderBadges(); });
+    $('#btnSound').addEventListener('click', toggleSound);
+    $('#btnMenu').addEventListener('click', () => { Sound.SFX.click(); renderMenu(); });
+  }
+
+  function renderStarIcons(n) {
+    let s = '';
+    for (let i = 0; i < 3; i++) s += '<i class="star' + (i < n ? ' on' : '') + '">★</i>';
+    return s;
+  }
+
+  function toggleSound() {
+    const cur = Store.get().settings.sound;
+    Store.setSetting('sound', !cur);
+    Sound.unlock();
+    if (!cur) Sound.SFX.click();
+    $('#btnSound').textContent = !cur ? '🔊' : '🔇';
+  }
+
+  // ================= 关卡开始前介绍 =================
+  function renderLevelIntro(levelId) {
+    const level = Levels.findLevel(levelId);
+    const rec = Store.levelRecord(levelId);
+    const savedLimit = Store.get().settings.timeLimit || 0;
+    const TIME_OPTS = [
+      { v: 0, label: '不限时', emoji: '🐢' },
+      { v: 5, label: '5秒', emoji: '⚡' },
+      { v: 10, label: '10秒', emoji: '🔥' },
+      { v: 20, label: '20秒', emoji: '⏱️' },
+      { v: 30, label: '30秒', emoji: '🕐' }
+    ];
+    const timeBtns = TIME_OPTS.map(o =>
+      '<button class="time-opt' + (o.v === savedLimit ? ' active' : '') + '" data-t="' + o.v + '">' +
+        '<span class="time-emoji">' + o.emoji + '</span>' + o.label +
+      '</button>'
+    ).join('');
+
+    show(
+      '<div class="screen center">' +
+        '<div class="intro-card pop">' +
+          '<div class="intro-emoji">' + level.emoji + '</div>' +
+          '<h1>' + level.name + '</h1>' +
+          '<p class="intro-sub">' + level.worldName + ' · 共 ' + level.count + ' 题</p>' +
+          '<div class="intro-stars">当前最好：' + renderStarIcons(rec.stars || 0) +
+            (rec.best ? ' <span class="best">最高分 ' + rec.best + '</span>' : '') + '</div>' +
+          '<div class="time-picker">' +
+            '<div class="time-label">⏳ 每题倒计时</div>' +
+            '<div class="time-opts">' + timeBtns + '</div>' +
+          '</div>' +
+          '<div class="intro-rules">🎯 全对得 <b>3⭐</b>　答对八成 <b>2⭐</b>　过关 <b>1⭐</b></div>' +
+          '<div class="intro-btns">' +
+            '<button class="btn primary big" id="btnStart">开始闯关 🚀</button>' +
+            '<button class="btn ghost" id="btnBack">返回地图</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>'
+    );
+    $$('.time-opt').forEach(btn => {
+      btn.addEventListener('click', () => {
+        Sound.SFX.click();
+        $$('.time-opt').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        Store.setSetting('timeLimit', parseInt(btn.dataset.t, 10));
+      });
+    });
+    $('#btnStart').addEventListener('click', () => { Sound.SFX.click(); startLevel(level); });
+    $('#btnBack').addEventListener('click', () => { Sound.SFX.click(); renderMap(); });
+  }
+
+  // ================= 答题会话 =================
+  function startLevel(level) {
+    const questions = Questions.generate(level.type, level.count);
+    session = {
+      level: level,
+      questions: questions,
+      idx: 0,
+      correct: 0,
+      wrong: 0,
+      combo: 0,
+      maxCombo: 0,
+      score: 0,
+      startAt: performance.now(),
+      timeLimit: Store.get().settings.timeLimit || 0,
+      timedOut: 0,
+      wrongItems: []
+    };
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    const s = session;
+    const q = s.questions[s.idx];
+    const progress = Math.round((s.idx / s.questions.length) * 100);
+
+    let inputArea;
+    if (q.inputMode === 'choice') {
+      inputArea =
+        '<div class="choices">' +
+          q.options.map((o, i) =>
+            '<button class="choice" data-val="' + encodeURIComponent(o) + '">' +
+              '<span class="choice-key">' + 'ABCD'[i] + '</span>' + o +
+            '</button>'
+          ).join('') +
+        '</div>';
+    } else {
+      inputArea =
+        '<div class="answer-box">' +
+          '<div class="answer-display" id="ansDisplay"><span class="placeholder">?</span></div>' +
+          keypadHtml(q) +
+        '</div>';
+    }
+
+    show(
+      '<div class="quiz">' +
+        '<div class="quiz-top">' +
+          '<button class="icon-btn" id="btnQuit" title="退出">✖</button>' +
+          '<div class="pbar"><div class="pbar-fill" style="width:' + progress + '%"></div></div>' +
+          '<div class="qcount">' + (s.idx + 1) + '/' + s.questions.length + '</div>' +
+        '</div>' +
+        (s.timeLimit > 0 ? timerHtml(s.timeLimit) : '') +
+        '<div class="combo-area">' + comboHtml(s.combo) + '</div>' +
+        '<div class="question pop" id="qText">' + q.text + ' =</div>' +
+        inputArea +
+        '<div class="feedback" id="feedback"></div>' +
+      '</div>'
+    );
+
+    $('#btnQuit').addEventListener('click', () => {
+      Sound.SFX.click();
+      stopTimer();
+      if (confirm('确定退出本关吗？进度不会保存哦～')) renderMap();
+      else if (s.timeLimit > 0 && !s.locked) startTimer(); // 取消退出则恢复计时
+    });
+
+    if (q.inputMode === 'choice') {
+      $$('.choice').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const val = decodeURIComponent(btn.dataset.val);
+          submitAnswer(val, btn);
+        });
+      });
+    } else {
+      bindKeypad(q);
+    }
+    s.qStartAt = performance.now();
+    if (s.timeLimit > 0) startTimer();
+  }
+
+  // ---------- 倒计时 ----------
+  function timerHtml(limit) {
+    return '<div class="timer" id="timer">' +
+      '<svg viewBox="0 0 44 44" class="timer-ring">' +
+        '<circle class="timer-track" cx="22" cy="22" r="19"></circle>' +
+        '<circle class="timer-arc" id="timerArc" cx="22" cy="22" r="19"></circle>' +
+      '</svg>' +
+      '<span class="timer-num" id="timerNum">' + limit + '</span>' +
+    '</div>';
+  }
+
+  function startTimer() {
+    const s = session;
+    if (!s || s.timeLimit <= 0) return;
+    stopTimer();
+    const arc = $('#timerArc');
+    const numEl = $('#timerNum');
+    const timerEl = $('#timer');
+    const CIRC = 2 * Math.PI * 19; // 周长
+    if (arc) { arc.style.strokeDasharray = CIRC; arc.style.strokeDashoffset = '0'; }
+
+    const totalMs = s.timeLimit * 1000;
+    s.timerStart = performance.now();
+    let lastTick = s.timeLimit;
+
+    s._timer = setInterval(() => {
+      const elapsed = performance.now() - s.timerStart;
+      const remain = Math.max(0, totalMs - elapsed);
+      const ratio = remain / totalMs;
+      const secLeft = Math.ceil(remain / 1000);
+
+      if (arc) arc.style.strokeDashoffset = String(CIRC * (1 - ratio));
+      if (numEl) numEl.textContent = secLeft;
+
+      // 最后 3 秒告警：变红 + 每秒滴答
+      if (timerEl) {
+        if (secLeft <= 3 && remain > 0) {
+          timerEl.classList.add('danger');
+          if (secLeft !== lastTick) Sound.SFX.tick();
+        } else {
+          timerEl.classList.remove('danger');
+        }
+      }
+      lastTick = secLeft;
+
+      if (remain <= 0) {
+        stopTimer();
+        onTimeout();
+      }
+    }, 100);
+  }
+
+  function stopTimer() {
+    if (session && session._timer) {
+      clearInterval(session._timer);
+      session._timer = null;
+    }
+  }
+
+  function onTimeout() {
+    const s = session;
+    if (!s || s.locked) return;
+    s.timedOut++;
+    submitAnswer(null, null, true); // 第三参数标记超时
+  }
+
+  function comboHtml(combo) {
+    if (combo < 2) return '';
+    return '<div class="combo-badge pop">🔥 连击 ×' + combo + '</div>';
+  }
+
+  // ---------- keypad ----------
+  function keypadHtml(q) {
+    const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    let grid = keys.map(k => '<button class="key" data-k="' + k + '">' + k + '</button>').join('');
+    // 底排：小数点(按需) / 0 / 退格
+    const dot = q.decimals > 0 ? '<button class="key" data-k=".">.</button>' : '<button class="key ghostkey" disabled></button>';
+    grid += dot + '<button class="key" data-k="0">0</button>' +
+            '<button class="key back" data-k="back">⌫</button>';
+    return '<div class="keypad">' + grid + '</div>' +
+           '<button class="btn primary big" id="btnSubmit" disabled>确定</button>';
+  }
+
+  function bindKeypad(q) {
+    let val = '';
+    const display = $('#ansDisplay');
+    const submit = $('#btnSubmit');
+
+    function refresh() {
+      display.innerHTML = val === '' ? '<span class="placeholder">?</span>' : val;
+      submit.disabled = val === '' || val === '.' || val === '-';
+    }
+    $$('.key').forEach(key => {
+      key.addEventListener('click', () => {
+        const k = key.dataset.k;
+        if (k === 'back') { val = val.slice(0, -1); }
+        else if (k === '.') { if (!val.includes('.') && val !== '') val += '.'; }
+        else { if (val.length < 8) val += k; }
+        Sound.SFX.click();
+        refresh();
+      });
+    });
+    submit.addEventListener('click', () => submitAnswer(val, submit));
+
+    // 物理键盘支持
+    const onKey = (e) => {
+      if (!session) return;
+      if (e.key >= '0' && e.key <= '9') { if (val.length < 8) val += e.key; refresh(); }
+      else if (e.key === '.' && q.decimals > 0) { if (!val.includes('.') && val !== '') { val += '.'; refresh(); } }
+      else if (e.key === 'Backspace') { val = val.slice(0, -1); refresh(); }
+      else if (e.key === 'Enter' && !submit.disabled) { submitAnswer(val, submit); }
+    };
+    document.addEventListener('keydown', onKey);
+    session._keyHandler = onKey;
+    refresh();
+  }
+
+  function clearKeyHandler() {
+    if (session && session._keyHandler) {
+      document.removeEventListener('keydown', session._keyHandler);
+      session._keyHandler = null;
+    }
+  }
+
+  // ---------- 判定 ----------
+  function submitAnswer(rawVal, srcEl, isTimeout) {
+    const s = session;
+    if (!s || s.locked) return;
+    s.locked = true;
+    stopTimer();
+    clearKeyHandler();
+
+    const q = s.questions[s.idx];
+    const isCorrect = !isTimeout && checkAnswer(q, rawVal);
+    const fb = $('#feedback');
+
+    if (isCorrect) {
+      s.correct++;
+      s.combo++;
+      s.maxCombo = Math.max(s.maxCombo, s.combo);
+      const bonus = s.combo >= 2 ? (s.combo - 1) * 2 : 0;
+      s.score += 10 + bonus;
+      if (s.combo >= 2) Sound.SFX.combo(s.combo); else Sound.SFX.correct();
+
+      const comboBadges = Store.grantComboBadge(s.combo);
+      fb.innerHTML = '<div class="fb ok pop">✅ 太棒了！' + (bonus ? ' <span class="bonus">连击+' + bonus + '</span>' : '') + '</div>';
+      if (srcEl) srcEl.classList.add('correct-flash');
+      spawnStars();
+      if (comboBadges.length) toastBadge(comboBadges[0]);
+    } else {
+      s.wrong++;
+      s.combo = 0;
+      s.wrongItems.push({ text: q.text, answer: displayAnswer(q) });
+      Sound.SFX.wrong();
+      const reason = isTimeout ? '⏰ 时间到！正确答案是 <b>' : '❌ 正确答案是 <b>';
+      fb.innerHTML = '<div class="fb no pop">' + reason + displayAnswer(q) + '</b></div>';
+      if (srcEl) srcEl.classList.add('wrong-flash');
+      shake();
+      // 超时也高亮计时器
+      const timerEl = $('#timer');
+      if (timerEl) timerEl.classList.add('danger');
+      // 高亮正确选项
+      if (q.inputMode === 'choice') {
+        $$('.choice').forEach(b => {
+          if (decodeURIComponent(b.dataset.val) === String(q.answer)) b.classList.add('correct-flash');
+          b.disabled = true;
+        });
+      }
+    }
+    // 禁用输入
+    $$('.key, .choice, #btnSubmit').forEach(b => b.disabled = true);
+
+    const delay = isCorrect ? 750 : 1500;
+    setTimeout(() => {
+      s.idx++;
+      s.locked = false;
+      if (s.idx >= s.questions.length) finishLevel();
+      else renderQuestion();
+    }, delay);
+  }
+
+  function checkAnswer(q, rawVal) {
+    if (q.inputMode === 'choice') return String(rawVal) === String(q.answer);
+    const num = parseFloat(rawVal);
+    if (isNaN(num)) return false;
+    if (q.decimals > 0) return Math.abs(num - q.answer) < 0.001;
+    return num === q.answer;
+  }
+
+  function displayAnswer(q) {
+    if (q.inputMode === 'choice') return String(q.answer);
+    return q.decimals > 0 ? q.answer.toFixed(q.decimals) : String(q.answer);
+  }
+
+  // ================= 结算 =================
+  function finishLevel() {
+    const s = session;
+    stopTimer();
+    clearKeyHandler();
+    const total = s.questions.length;
+    const accuracy = s.correct / total;
+    const elapsed = (performance.now() - s.startAt) / 1000;
+    const avgSec = elapsed / total;
+    const result = Store.recordResult(s.level.id, s.level.type, s.correct, total, avgSec);
+    const stars = result.newStars;
+
+    if (stars >= 1) Sound.SFX.win(); else Sound.SFX.wrong();
+
+    const nextLevel = getNextLevel(s.level.id);
+    const canNext = nextLevel && Store.isUnlocked(nextLevel.id);
+
+    let badgeHtml = '';
+    if (result.newBadges && result.newBadges.length) {
+      badgeHtml = '<div class="earned-badges">' +
+        result.newBadges.map(b => '<span class="earned pop">' + b.emoji + ' ' + b.name + '</span>').join('') +
+        '</div>';
+      setTimeout(() => Sound.SFX.badge(), 600);
+    }
+
+    const wrongReview = s.wrongItems.length
+      ? '<details class="wrong-review"><summary>看看错题 (' + s.wrongItems.length + ')</summary>' +
+        s.wrongItems.map(w => '<div class="wrong-row">' + w.text + ' = <b>' + w.answer + '</b></div>').join('') +
+        '</details>'
+      : '<div class="all-correct">🎉 全部答对，太厉害啦！</div>';
+
+    show(
+      '<div class="screen center">' +
+        '<div class="result-card pop">' +
+          '<div class="result-stars" id="resultStars">' + bigStars(stars) + '</div>' +
+          '<h1>' + (stars >= 1 ? '闯关成功！' : '再试一次吧') + '</h1>' +
+          (s.timeLimit > 0 ? '<div class="mode-tag">⏳ 限时模式 · 每题 ' + s.timeLimit + ' 秒</div>' : '') +
+          '<div class="result-stats">' +
+            '<div><span>' + s.correct + '/' + total + '</span>答对</div>' +
+            '<div><span>' + s.score + '</span>得分</div>' +
+            '<div><span>' + s.maxCombo + '</span>最高连击</div>' +
+            '<div><span>' + elapsed.toFixed(0) + 's</span>用时</div>' +
+          '</div>' +
+          (s.timedOut > 0 ? '<div class="timeout-note">⏰ 有 ' + s.timedOut + ' 题超时了，下次手要快一点哦！</div>' : '') +
+          (result.fast && stars >= 2 ? '<div class="fast-medal pop">⚡ 速度奖章：手速飞快！</div>' : '') +
+          badgeHtml +
+          wrongReview +
+          '<div class="intro-btns">' +
+            (canNext ? '<button class="btn primary big" id="btnNext">下一关 ➡️</button>' : '') +
+            '<button class="btn" id="btnRetry">再玩一次 🔄</button>' +
+            '<button class="btn ghost" id="btnMap">返回地图</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>'
+    );
+
+    if (stars >= 1) burstConfetti();
+    // 星星逐个点亮动画
+    animateResultStars(stars);
+
+    if (canNext) $('#btnNext').addEventListener('click', () => { Sound.SFX.click(); renderLevelIntro(nextLevel.id); });
+    $('#btnRetry').addEventListener('click', () => { Sound.SFX.click(); startLevel(s.level); });
+    $('#btnMap').addEventListener('click', () => { Sound.SFX.click(); renderMap(); });
+  }
+
+  function bigStars(n) {
+    let s = '';
+    for (let i = 0; i < 3; i++) s += '<i class="bigstar' + (i < n ? ' on' : '') + '" data-i="' + i + '">★</i>';
+    return s;
+  }
+  function animateResultStars(n) {
+    const stars = $$('#resultStars .bigstar.on');
+    stars.forEach((st, i) => {
+      setTimeout(() => { st.classList.add('drop'); Sound.SFX.star(); }, 300 + i * 350);
+    });
+  }
+
+  function getNextLevel(levelId) {
+    // 只在同一年级(世界)内找下一关；年级最后一关无“下一关”，引导回地图
+    for (const w of Levels.WORLDS) {
+      const idx = w.levels.findIndex(l => l.id === levelId);
+      if (idx === -1) continue;
+      if (idx < w.levels.length - 1) {
+        return Object.assign({ worldId: w.id }, w.levels[idx + 1]);
+      }
+      return null;
+    }
+    return null;
+  }
+
+  // ================= 徽章墙 =================
+  function renderBadges() {
+    const defs = Store.badgeDefs();
+    const cards = defs.map(b => {
+      const owned = Store.hasBadge(b.id);
+      return '<div class="badge-card' + (owned ? ' owned' : '') + '">' +
+        '<div class="badge-emoji">' + (owned ? b.emoji : '🔒') + '</div>' +
+        '<div class="badge-name">' + b.name + '</div>' +
+      '</div>';
+    }).join('');
+
+    const weak = Store.weakestType();
+    let weakHtml = '';
+    if (weak) {
+      const lvl = Levels.flatLevels().find(l => l.type === weak.type);
+      weakHtml = '<div class="weak-tip">📊 需要加强：<b>' + (lvl ? lvl.name : weak.type) +
+        '</b>（错误率 ' + Math.round(weak.wrongRate * 100) + '%），多练练就掌握啦！</div>';
+    }
+
+    show(
+      '<header class="topbar">' +
+        '<button class="icon-btn" id="btnBack">⬅️</button>' +
+        '<div class="brand">🏅 我的徽章墙</div>' +
+        '<div class="topbar-right"><span class="star-count">⭐ ' + Store.totalStars() + '</span></div>' +
+      '</header>' +
+      '<div class="badge-wall">' + cards + '</div>' +
+      weakHtml +
+      '<div class="stat-summary">累计答对 <b>' + Store.get().stats.totalCorrect + '</b> 题</div>'
+    );
+    $('#btnBack').addEventListener('click', () => { Sound.SFX.click(); renderMap(); });
+  }
+
+  // ================= 设置菜单 =================
+  function renderMenu() {
+    show(
+      '<div class="screen center">' +
+        '<div class="intro-card pop">' +
+          '<h1>⚙️ 设置</h1>' +
+          '<div class="menu-list">' +
+            '<button class="btn" id="mSound">' + (Store.get().settings.sound ? '🔊 音效：开' : '🔇 音效：关') + '</button>' +
+            '<button class="btn" id="mBadges">🏅 查看徽章墙</button>' +
+            '<button class="btn danger" id="mReset">🗑️ 清空所有进度</button>' +
+          '</div>' +
+          '<button class="btn ghost" id="mBack">返回地图</button>' +
+          '<p class="version">口算太空大冒险 v1.0 · 纯本地存档</p>' +
+        '</div>' +
+      '</div>'
+    );
+    $('#mSound').addEventListener('click', () => {
+      toggleSoundSilent();
+      $('#mSound').textContent = Store.get().settings.sound ? '🔊 音效：开' : '🔇 音效：关';
+    });
+    $('#mBadges').addEventListener('click', () => { Sound.SFX.click(); renderBadges(); });
+    $('#mReset').addEventListener('click', () => {
+      if (confirm('确定清空全部闯关进度和徽章吗？此操作无法撤销！')) {
+        Store.reset();
+        renderMap();
+      }
+    });
+    $('#mBack').addEventListener('click', () => { Sound.SFX.click(); renderMap(); });
+  }
+  function toggleSoundSilent() {
+    const cur = Store.get().settings.sound;
+    Store.setSetting('sound', !cur);
+    Sound.unlock();
+    if (!cur) Sound.SFX.click();
+  }
+
+  // ================= 动画效果 =================
+  function spawnStars() {
+    const layer = ensureFxLayer();
+    for (let i = 0; i < 8; i++) {
+      const s = document.createElement('div');
+      s.className = 'fx-star';
+      s.textContent = ['⭐', '✨', '🌟'][i % 3];
+      s.style.left = (40 + Math.random() * 20) + '%';
+      s.style.top = '45%';
+      s.style.setProperty('--dx', (Math.random() * 240 - 120) + 'px');
+      s.style.setProperty('--dy', (-Math.random() * 180 - 60) + 'px');
+      layer.appendChild(s);
+      setTimeout(() => s.remove(), 900);
+    }
+  }
+  function burstConfetti() {
+    const layer = ensureFxLayer();
+    const colors = ['#ffd93d', '#ff6bcb', '#6bcbff', '#7dff9b', '#ff9d5c'];
+    for (let i = 0; i < 40; i++) {
+      const c = document.createElement('div');
+      c.className = 'confetti';
+      c.style.left = Math.random() * 100 + '%';
+      c.style.background = colors[i % colors.length];
+      c.style.animationDelay = (Math.random() * 0.4) + 's';
+      c.style.setProperty('--rot', (Math.random() * 720 - 360) + 'deg');
+      layer.appendChild(c);
+      setTimeout(() => c.remove(), 2200);
+    }
+  }
+  function ensureFxLayer() {
+    let layer = $('#fxLayer');
+    if (!layer) {
+      layer = document.createElement('div');
+      layer.id = 'fxLayer';
+      layer.className = 'fx-layer';
+      document.body.appendChild(layer);
+    }
+    return layer;
+  }
+  function shake() {
+    const q = $('.quiz');
+    if (!q) return;
+    q.classList.remove('shake');
+    void q.offsetWidth;
+    q.classList.add('shake');
+  }
+  function toastBadge(b) {
+    const t = document.createElement('div');
+    t.className = 'badge-toast pop';
+    t.innerHTML = b.emoji + ' 获得徽章：' + b.name;
+    document.body.appendChild(t);
+    Sound.SFX.badge();
+    setTimeout(() => t.classList.add('out'), 1600);
+    setTimeout(() => t.remove(), 2200);
+  }
+
+  // ================= 启动 =================
+  function init() {
+    renderMap();
+    // 首次任意点击唤醒音频
+    document.body.addEventListener('pointerdown', () => Sound.unlock(), { once: true });
+  }
+
+  global.Game = { init: init };
+})(window);
+
+  </script>
+  <script>
+    window.addEventListener('DOMContentLoaded', function () {
+      window.Game.init();
+    });
+  </script>
+</body>
+</html>
