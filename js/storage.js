@@ -1,10 +1,12 @@
-// 进度存储：localStorage 持久化
-// 存储结构：
+// 进度存储：localStorage 持久化（支持数学/英语双科目分区）
+// 存储结构 v2：
 // {
-//   levels: { [levelId]: { stars, best, fast, plays } },
-//   badges: [ 'first_win', 'combo10', ... ],
-//   stats:  { totalCorrect, totalWrong, byType: { [type]:{correct,wrong} } },
-//   settings: { sound: true, theme: 'space' }
+//   subjects: {
+//     math:    { levels:{[id]:{stars,best,fast,plays}}, stats:{totalCorrect,totalWrong,byType:{}} },
+//     english: { levels:{...}, stats:{...} }
+//   },
+//   badges: [ 'math:first_win', 'english:stars10', 'combo10', ... ],  // 科目相关徽章带前缀
+//   settings: { sound, theme, timeLimit }
 // }
 
 (function (global) {
@@ -12,25 +14,52 @@
 
   const KEY = 'mathQuestGame_v1';
 
-  const DEFAULT = {
-    levels: {},
-    badges: [],
-    stats: { totalCorrect: 0, totalWrong: 0, byType: {} },
-    settings: { sound: true, theme: 'space', timeLimit: 0 }
-  };
+  function emptySubject() {
+    return { levels: {}, stats: { totalCorrect: 0, totalWrong: 0, byType: {} } };
+  }
+  function defaultState() {
+    return {
+      subjects: { math: emptySubject(), english: emptySubject() },
+      badges: [],
+      settings: { sound: true, theme: 'space', timeLimit: 0 }
+    };
+  }
+
+  // 旧版(v1,纯数学)存档迁移：{levels,badges,stats,settings} -> subjects.math
+  function migrate(data) {
+    if (data && data.subjects) return data; // 已是新结构
+    const st = defaultState();
+    if (data) {
+      if (data.levels) st.subjects.math.levels = data.levels;
+      if (data.stats) st.subjects.math.stats = Object.assign(st.subjects.math.stats, data.stats);
+      if (Array.isArray(data.badges)) {
+        // 旧徽章都是数学的，加 math: 前缀（combo10 是通用的，保留原样）
+        st.badges = data.badges.map(b => (b === 'combo10' ? b : 'math:' + b));
+      }
+      if (data.settings) st.settings = Object.assign(st.settings, data.settings);
+    }
+    return st;
+  }
 
   function load() {
     try {
       const raw = localStorage.getItem(KEY);
-      if (!raw) return JSON.parse(JSON.stringify(DEFAULT));
-      const data = JSON.parse(raw);
-      // 合并默认字段，防止旧存档缺字段
-      return Object.assign(JSON.parse(JSON.stringify(DEFAULT)), data, {
-        settings: Object.assign({}, DEFAULT.settings, data.settings || {}),
-        stats: Object.assign({}, DEFAULT.stats, data.stats || {})
+      if (!raw) return defaultState();
+      const data = migrate(JSON.parse(raw));
+      // 补全字段，防止半旧存档缺项
+      const base = defaultState();
+      base.settings = Object.assign(base.settings, data.settings || {});
+      base.badges = Array.isArray(data.badges) ? data.badges : [];
+      ['math', 'english'].forEach(sid => {
+        const s = (data.subjects && data.subjects[sid]) || {};
+        base.subjects[sid] = {
+          levels: s.levels || {},
+          stats: Object.assign({ totalCorrect: 0, totalWrong: 0, byType: {} }, s.stats || {})
+        };
       });
+      return base;
     } catch (e) {
-      return JSON.parse(JSON.stringify(DEFAULT));
+      return defaultState();
     }
   }
 
@@ -41,92 +70,98 @@
   }
 
   function get() { return state; }
+  function sub(subjectId) {
+    if (!state.subjects[subjectId]) state.subjects[subjectId] = emptySubject();
+    return state.subjects[subjectId];
+  }
 
-  // 关卡是否解锁：每个年级(世界)的第一关直接开放，无需先通关低年级；
-  // 年级内部仍需前一关拿到 >=1 星才解锁下一关。
-  function isUnlocked(levelId) {
-    const worlds = global.Levels.WORLDS;
+  // 关卡是否解锁：每个年级(世界)第一关直接开放；年级内前一关拿 >=1 星解锁下一关
+  function isUnlocked(subjectId, levelId) {
+    const worlds = global.Subjects.get(subjectId).worlds;
     for (const w of worlds) {
       const idx = w.levels.findIndex(l => l.id === levelId);
-      if (idx === -1) continue;        // 不在这个年级里，继续找
-      if (idx === 0) return true;      // 每个年级第一关直接开放
+      if (idx === -1) continue;
+      if (idx === 0) return true;
       const prev = w.levels[idx - 1];
-      const rec = state.levels[prev.id];
-      return !!(rec && rec.stars >= 1); // 年级内逐关解锁
+      const rec = sub(subjectId).levels[prev.id];
+      return !!(rec && rec.stars >= 1);
     }
     return true;
   }
 
-  function levelRecord(levelId) {
-    return state.levels[levelId] || { stars: 0, best: 0, fast: false, plays: 0 };
+  function levelRecord(subjectId, levelId) {
+    return sub(subjectId).levels[levelId] || { stars: 0, best: 0, fast: false, plays: 0 };
   }
 
-  // 记录一次通关结果，返回 { newStars, improved, newBadges }
-  function recordResult(levelId, type, correct, total, avgSec) {
+  // 记录一次通关结果
+  function recordResult(subjectId, levelId, type, correct, total, avgSec) {
+    const S = global.Subjects.get(subjectId);
     const accuracy = total > 0 ? correct / total : 0;
-    const stars = global.Levels.starsFor(accuracy);
-    const prev = levelRecord(levelId);
+    const stars = S.starsFor(accuracy);
+    const prev = levelRecord(subjectId, levelId);
     const score = Math.round(accuracy * 100);
+    const fastSec = S.fastSec();
 
     const rec = {
       stars: Math.max(prev.stars, stars),
       best: Math.max(prev.best, score),
-      fast: prev.fast || (avgSec <= global.Levels.FAST_SEC && accuracy >= 0.8),
+      fast: prev.fast || (avgSec <= fastSec && accuracy >= 0.8),
       plays: prev.plays + 1
     };
     const improved = stars > prev.stars || score > prev.best;
-    state.levels[levelId] = rec;
+    sub(subjectId).levels[levelId] = rec;
 
-    // 统计
-    state.stats.totalCorrect += correct;
-    state.stats.totalWrong += (total - correct);
-    if (!state.stats.byType[type]) state.stats.byType[type] = { correct: 0, wrong: 0 };
-    state.stats.byType[type].correct += correct;
-    state.stats.byType[type].wrong += (total - correct);
+    const st = sub(subjectId).stats;
+    st.totalCorrect += correct;
+    st.totalWrong += (total - correct);
+    if (!st.byType[type]) st.byType[type] = { correct: 0, wrong: 0 };
+    st.byType[type].correct += correct;
+    st.byType[type].wrong += (total - correct);
 
-    const newBadges = checkBadges();
+    const newBadges = checkBadges(subjectId);
     save();
     return { newStars: stars, storedStars: rec.stars, improved: improved, newBadges: newBadges, fast: rec.fast };
   }
 
-  // 徽章检查
-  const BADGE_DEFS = [
-    { id: 'first_win', name: '首次通关', emoji: '🎖️', test: s => totalStars() >= 1 },
-    { id: 'stars10', name: '集星达人', emoji: '⭐', test: s => totalStars() >= 10 },
-    { id: 'stars30', name: '星光闪耀', emoji: '🌟', test: s => totalStars() >= 30 },
-    { id: 'stars_all', name: '宇宙之王', emoji: '👑', test: s => totalStars() >= maxStars() },
-    { id: 'w1_clear', name: '月球毕业', emoji: '🌙', test: s => worldCleared('w1') },
-    { id: 'w2_clear', name: '火星毕业', emoji: '🔴', test: s => worldCleared('w2') },
-    { id: 'perfect5', name: '五连满星', emoji: '💯', test: s => perfectCount() >= 5 }
+  // ---------- 星数统计（按科目） ----------
+  function totalStars(subjectId) {
+    return Object.values(sub(subjectId).levels).reduce((s, r) => s + (r.stars || 0), 0);
+  }
+  function maxStars(subjectId) {
+    return global.Subjects.flatLevels(subjectId).length * 3;
+  }
+  function perfectCount(subjectId) {
+    return Object.values(sub(subjectId).levels).filter(r => r.stars === 3).length;
+  }
+  function worldCleared(subjectId, worldId) {
+    const w = global.Subjects.get(subjectId).worlds.find(x => x.id === worldId);
+    if (!w) return false;
+    return w.levels.every(l => (sub(subjectId).levels[l.id] && sub(subjectId).levels[l.id].stars >= 1));
+  }
+
+  // ---------- 徽章（科目相关的带 subjectId: 前缀）----------
+  // 每科通用徽章模板
+  const BADGE_TPL = [
+    { id: 'first_win', name: '首次通关', emoji: '🎖️', test: (sid) => totalStars(sid) >= 1 },
+    { id: 'stars10', name: '集星达人', emoji: '⭐', test: (sid) => totalStars(sid) >= 10 },
+    { id: 'stars30', name: '星光闪耀', emoji: '🌟', test: (sid) => totalStars(sid) >= 30 },
+    { id: 'all_clear', name: '全科满星', emoji: '👑', test: (sid) => totalStars(sid) >= maxStars(sid) },
+    { id: 'perfect5', name: '五连满星', emoji: '💯', test: (sid) => perfectCount(sid) >= 5 }
   ];
 
-  function totalStars() {
-    return Object.values(state.levels).reduce((sum, r) => sum + (r.stars || 0), 0);
-  }
-  function maxStars() {
-    return global.Levels.flatLevels().length * 3;
-  }
-  function perfectCount() {
-    return Object.values(state.levels).filter(r => r.stars === 3).length;
-  }
-  function worldCleared(worldId) {
-    const w = global.Levels.WORLDS.find(x => x.id === worldId);
-    if (!w) return false;
-    return w.levels.every(l => (state.levels[l.id] && state.levels[l.id].stars >= 1));
-  }
-
-  function checkBadges() {
+  function checkBadges(subjectId) {
     const earned = [];
-    for (const b of BADGE_DEFS) {
-      if (!state.badges.includes(b.id) && b.test(state)) {
-        state.badges.push(b.id);
-        earned.push(b);
+    for (const b of BADGE_TPL) {
+      const key = subjectId + ':' + b.id;
+      if (!state.badges.includes(key) && b.test(subjectId)) {
+        state.badges.push(key);
+        earned.push(Object.assign({}, b, { id: key }));
       }
     }
     return earned;
   }
 
-  // combo 徽章（答题过程中触发）
+  // combo 徽章（通用，不分科）
   function grantComboBadge(combo) {
     const earned = [];
     if (combo >= 10 && !state.badges.includes('combo10')) {
@@ -137,13 +172,19 @@
     return earned;
   }
 
-  function badgeDefs() { return BADGE_DEFS.concat([{ id: 'combo10', name: '十连击', emoji: '🔥' }]); }
+  // 某科目的徽章定义列表（用于徽章墙展示）
+  function badgeDefs(subjectId) {
+    const list = BADGE_TPL.map(b => Object.assign({}, b, { id: subjectId + ':' + b.id }));
+    list.push({ id: 'combo10', name: '十连击', emoji: '🔥' });
+    return list;
+  }
   function hasBadge(id) { return state.badges.includes(id); }
 
-  // 找出最薄弱的题型（错误率最高，且做过 >=5 题）
-  function weakestType() {
+  // 最薄弱题型（按科目）
+  function weakestType(subjectId) {
     let worst = null, worstRate = -1;
-    for (const [type, rec] of Object.entries(state.stats.byType)) {
+    const byType = sub(subjectId).stats.byType;
+    for (const [type, rec] of Object.entries(byType)) {
       const total = rec.correct + rec.wrong;
       if (total < 5) continue;
       const rate = rec.wrong / total;
@@ -152,13 +193,21 @@
     return worst ? { type: worst, wrongRate: worstRate } : null;
   }
 
+  function totalCorrectOf(subjectId) { return sub(subjectId).stats.totalCorrect; }
+
   function setSetting(key, value) {
     state.settings[key] = value;
     save();
   }
 
-  function reset() {
-    state = JSON.parse(JSON.stringify(DEFAULT));
+  // 清空：可指定科目，不传则全清
+  function reset(subjectId) {
+    if (subjectId) {
+      state.subjects[subjectId] = emptySubject();
+      state.badges = state.badges.filter(b => b.indexOf(subjectId + ':') !== 0);
+    } else {
+      state = defaultState();
+    }
     save();
   }
 
@@ -175,6 +224,7 @@
     maxStars: maxStars,
     weakestType: weakestType,
     worldCleared: worldCleared,
+    totalCorrectOf: totalCorrectOf,
     setSetting: setSetting,
     reset: reset
   };

@@ -1,4 +1,4 @@
-// 游戏主逻辑：屏幕切换、地图、答题、结算
+// 游戏主逻辑：科目首页、屏幕切换、地图、答题、结算（数学 + 英语双科）
 (function (global) {
   'use strict';
 
@@ -6,33 +6,67 @@
   const $$ = (sel, root) => Array.from((root || document).querySelectorAll(sel));
   const app = () => $('#app');
 
-  // 当前答题会话
   let session = null;
+  let curSubject = 'math'; // 当前科目
 
-  // ---------- 屏幕切换 ----------
   function show(html) {
     const root = app();
     root.innerHTML = html;
     root.scrollTop = 0;
   }
-
-  function emojiStars(n) {
-    return '★★★'.slice(0, n).padEnd(3, '☆');
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
-  // ================= 主菜单 / 地图 =================
+  // ================= 科目首页 =================
+  function renderHome() {
+    stopTimer();
+    session = null;
+    const cards = Subjects.all().map(sub => {
+      const ts = Store.totalStars(sub.id);
+      const ms = Store.maxStars(sub.id);
+      return '<button class="subject-card" data-sub="' + sub.id + '" style="--sc:' + sub.color + '">' +
+        '<div class="subject-emoji">' + sub.emoji + '</div>' +
+        '<div class="subject-name">' + sub.name + '</div>' +
+        '<div class="subject-tag">' + sub.tagline + '</div>' +
+        '<div class="subject-stars">⭐ ' + ts + ' / ' + ms + '</div>' +
+      '</button>';
+    }).join('');
+
+    show(
+      '<div class="home">' +
+        '<div class="home-hero">' +
+          '<div class="home-title">🌌 学习大冒险</div>' +
+          '<div class="home-sub">选择今天想闯关的科目吧！</div>' +
+        '</div>' +
+        '<div class="subject-grid">' + cards + '</div>' +
+        '<footer class="tip">💡 数学和英语进度各自独立，随时切换～</footer>' +
+      '</div>'
+    );
+    $$('.subject-card').forEach(btn => {
+      btn.addEventListener('click', () => {
+        Sound.unlock();
+        Sound.SFX.click();
+        curSubject = btn.dataset.sub;
+        renderMap();
+      });
+    });
+  }
+
+  // ================= 关卡地图（按当前科目） =================
   function renderMap() {
     stopTimer();
     session = null;
-    const total = Store.totalStars();
-    const max = Store.maxStars();
+    const sub = Subjects.get(curSubject);
+    const total = Store.totalStars(curSubject);
+    const max = Store.maxStars(curSubject);
     let worldsHtml = '';
 
-    Levels.WORLDS.forEach(w => {
+    sub.worlds.forEach(w => {
       let levelsHtml = '';
       w.levels.forEach(l => {
-        const unlocked = Store.isUnlocked(l.id);
-        const rec = Store.levelRecord(l.id);
+        const unlocked = Store.isUnlocked(curSubject, l.id);
+        const rec = Store.levelRecord(curSubject, l.id);
         const stars = rec.stars || 0;
         const cls = 'node' + (unlocked ? '' : ' locked') + (stars === 3 ? ' perfect' : '');
         const starHtml = unlocked
@@ -58,7 +92,8 @@
 
     show(
       '<header class="topbar">' +
-        '<div class="brand">🚀 口算太空大冒险</div>' +
+        '<button class="icon-btn" id="btnHome" title="切换科目">🏠</button>' +
+        '<div class="brand">' + sub.emoji + ' ' + sub.name + '</div>' +
         '<div class="topbar-right">' +
           '<span class="star-count">⭐ ' + total + ' / ' + max + '</span>' +
           '<button class="icon-btn" id="btnBadges" title="徽章墙">🏅</button>' +
@@ -77,6 +112,7 @@
         renderLevelIntro(btn.dataset.level);
       });
     });
+    $('#btnHome').addEventListener('click', () => { Sound.SFX.click(); renderHome(); });
     $('#btnBadges').addEventListener('click', () => { Sound.SFX.click(); renderBadges(); });
     $('#btnSound').addEventListener('click', toggleSound);
     $('#btnMenu').addEventListener('click', () => { Sound.SFX.click(); renderMenu(); });
@@ -93,13 +129,14 @@
     Store.setSetting('sound', !cur);
     Sound.unlock();
     if (!cur) Sound.SFX.click();
-    $('#btnSound').textContent = !cur ? '🔊' : '🔇';
+    const el = $('#btnSound');
+    if (el) el.textContent = !cur ? '🔊' : '🔇';
   }
 
   // ================= 关卡开始前介绍 =================
   function renderLevelIntro(levelId) {
-    const level = Levels.findLevel(levelId);
-    const rec = Store.levelRecord(levelId);
+    const level = Subjects.findLevel(curSubject, levelId);
+    const rec = Store.levelRecord(curSubject, levelId);
     const savedLimit = Store.get().settings.timeLimit || 0;
     const TIME_OPTS = [
       { v: 0, label: '不限时', emoji: '🐢' },
@@ -148,8 +185,10 @@
 
   // ================= 答题会话 =================
   function startLevel(level) {
-    const questions = Questions.generate(level.type, level.count);
+    const sub = Subjects.get(curSubject);
+    const questions = sub.gen(level.type, level.count);
     session = {
+      subjectId: curSubject,
       level: level,
       questions: questions,
       idx: 0,
@@ -166,18 +205,22 @@
     renderQuestion();
   }
 
+  function isEnglish() { return session && session.subjectId === 'english'; }
+
   function renderQuestion() {
     const s = session;
     const q = s.questions[s.idx];
     const progress = Math.round((s.idx / s.questions.length) * 100);
 
     let inputArea;
-    if (q.inputMode === 'choice') {
+    if (q.inputMode === 'spell') {
+      inputArea = spellArea(q);
+    } else if (q.inputMode === 'choice') {
       inputArea =
-        '<div class="choices">' +
+        '<div class="choices' + (q.long ? ' choices-col' : '') + '">' +
           q.options.map((o, i) =>
             '<button class="choice" data-val="' + encodeURIComponent(o) + '">' +
-              '<span class="choice-key">' + 'ABCD'[i] + '</span>' + o +
+              '<span class="choice-key">' + 'ABCD'[i] + '</span><span class="choice-txt">' + esc(o) + '</span>' +
             '</button>'
           ).join('') +
         '</div>';
@@ -189,6 +232,14 @@
         '</div>';
     }
 
+    // 题干区：英语题带发音按钮（若该题有 speak 内容）
+    const canSpeak = isEnglish() && q.speak && Sound.supportsSpeech();
+    const speakBtn = canSpeak
+      ? '<button class="speak-btn" id="btnSpeak" title="听发音">🔊</button>'
+      : '';
+    const qClass = isEnglish() ? 'question en pop' : 'question pop';
+    const qSuffix = isEnglish() ? '' : ' =';
+
     show(
       '<div class="quiz">' +
         '<div class="quiz-top">' +
@@ -198,7 +249,8 @@
         '</div>' +
         (s.timeLimit > 0 ? timerHtml(s.timeLimit) : '') +
         '<div class="combo-area">' + comboHtml(s.combo) + '</div>' +
-        '<div class="question pop" id="qText">' + q.text + ' =</div>' +
+        (q.hint ? '<div class="q-hint">' + q.hint + '</div>' : '') +
+        '<div class="' + qClass + '" id="qText">' + q.text + qSuffix + speakBtn + '</div>' +
         inputArea +
         '<div class="feedback" id="feedback"></div>' +
       '</div>'
@@ -208,10 +260,21 @@
       Sound.SFX.click();
       stopTimer();
       if (confirm('确定退出本关吗？进度不会保存哦～')) renderMap();
-      else if (s.timeLimit > 0 && !s.locked) startTimer(); // 取消退出则恢复计时
+      else if (s.timeLimit > 0 && !s.locked) startTimer();
     });
 
-    if (q.inputMode === 'choice') {
+    if (canSpeak) {
+      const sb = $('#btnSpeak');
+      if (sb) sb.addEventListener('click', (e) => { e.stopPropagation(); Sound.speak(q.speak); });
+      // 进入题目自动读一次（词汇/拼写题）
+      if (q.inputMode !== 'choice' || q.speak) {
+        setTimeout(() => Sound.speak(q.speak), 350);
+      }
+    }
+
+    if (q.inputMode === 'spell') {
+      bindSpell(q);
+    } else if (q.inputMode === 'choice') {
       $$('.choice').forEach(btn => {
         btn.addEventListener('click', () => {
           const val = decodeURIComponent(btn.dataset.val);
@@ -243,7 +306,7 @@
     const arc = $('#timerArc');
     const numEl = $('#timerNum');
     const timerEl = $('#timer');
-    const CIRC = 2 * Math.PI * 19; // 周长
+    const CIRC = 2 * Math.PI * 19;
     if (arc) { arc.style.strokeDasharray = CIRC; arc.style.strokeDashoffset = '0'; }
 
     const totalMs = s.timeLimit * 1000;
@@ -259,7 +322,6 @@
       if (arc) arc.style.strokeDashoffset = String(CIRC * (1 - ratio));
       if (numEl) numEl.textContent = secLeft;
 
-      // 最后 3 秒告警：变红 + 每秒滴答
       if (timerEl) {
         if (secLeft <= 3 && remain > 0) {
           timerEl.classList.add('danger');
@@ -288,7 +350,7 @@
     const s = session;
     if (!s || s.locked) return;
     s.timedOut++;
-    submitAnswer(null, null, true); // 第三参数标记超时
+    submitAnswer(null, null, true);
   }
 
   function comboHtml(combo) {
@@ -296,11 +358,10 @@
     return '<div class="combo-badge pop">🔥 连击 ×' + combo + '</div>';
   }
 
-  // ---------- keypad ----------
+  // ---------- 数字键盘（数学） ----------
   function keypadHtml(q) {
     const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
     let grid = keys.map(k => '<button class="key" data-k="' + k + '">' + k + '</button>').join('');
-    // 底排：小数点(按需) / 0 / 退格
     const dot = q.decimals > 0 ? '<button class="key" data-k=".">.</button>' : '<button class="key ghostkey" disabled></button>';
     grid += dot + '<button class="key" data-k="0">0</button>' +
             '<button class="key back" data-k="back">⌫</button>';
@@ -329,7 +390,6 @@
     });
     submit.addEventListener('click', () => submitAnswer(val, submit));
 
-    // 物理键盘支持
     const onKey = (e) => {
       if (!session) return;
       if (e.key >= '0' && e.key <= '9') { if (val.length < 8) val += e.key; refresh(); }
@@ -339,6 +399,52 @@
     };
     document.addEventListener('keydown', onKey);
     session._keyHandler = onKey;
+    refresh();
+  }
+
+  // ---------- 字母键盘（英语拼写） ----------
+  function spellArea(q) {
+    const keys = q.letters.map((c, i) =>
+      '<button class="lkey" data-c="' + c + '" data-i="' + i + '">' + c + '</button>'
+    ).join('');
+    return '<div class="answer-box">' +
+        '<div class="answer-display spell" id="ansDisplay"><span class="placeholder">_ _ _</span></div>' +
+        '<div class="letter-pad">' + keys + '</div>' +
+        '<div class="spell-btns">' +
+          '<button class="btn" id="btnClear">清空</button>' +
+          '<button class="btn primary big" id="btnSubmit" disabled>确定</button>' +
+        '</div>' +
+      '</div>';
+  }
+
+  function bindSpell(q) {
+    let val = '';
+    const usedIdx = [];
+    const display = $('#ansDisplay');
+    const submit = $('#btnSubmit');
+
+    function refresh() {
+      display.innerHTML = val === '' ? '<span class="placeholder">_ _ _</span>' : esc(val);
+      submit.disabled = val.length === 0;
+    }
+    $$('.lkey').forEach(key => {
+      key.addEventListener('click', () => {
+        if (key.classList.contains('used')) return;
+        if (val.length >= 12) return;
+        val += key.dataset.c;
+        key.classList.add('used');
+        usedIdx.push(key);
+        Sound.SFX.click();
+        refresh();
+      });
+    });
+    $('#btnClear').addEventListener('click', () => {
+      val = '';
+      usedIdx.splice(0).forEach(k => k.classList.remove('used'));
+      Sound.SFX.click();
+      refresh();
+    });
+    submit.addEventListener('click', () => submitAnswer(val, submit));
     refresh();
   }
 
@@ -373,20 +479,21 @@
       fb.innerHTML = '<div class="fb ok pop">✅ 太棒了！' + (bonus ? ' <span class="bonus">连击+' + bonus + '</span>' : '') + '</div>';
       if (srcEl) srcEl.classList.add('correct-flash');
       spawnStars();
+      // 英语答对后，读出正确英文（强化记忆）
+      if (isEnglish()) speakReveal(q);
       if (comboBadges.length) toastBadge(comboBadges[0]);
     } else {
       s.wrong++;
       s.combo = 0;
-      s.wrongItems.push({ text: q.text, answer: displayAnswer(q) });
+      s.wrongItems.push({ text: plainQ(q), answer: displayAnswer(q) });
       Sound.SFX.wrong();
       const reason = isTimeout ? '⏰ 时间到！正确答案是 <b>' : '❌ 正确答案是 <b>';
-      fb.innerHTML = '<div class="fb no pop">' + reason + displayAnswer(q) + '</b></div>';
+      fb.innerHTML = '<div class="fb no pop">' + reason + esc(displayAnswer(q)) + '</b></div>';
       if (srcEl) srcEl.classList.add('wrong-flash');
       shake();
-      // 超时也高亮计时器
       const timerEl = $('#timer');
       if (timerEl) timerEl.classList.add('danger');
-      // 高亮正确选项
+      if (isEnglish()) speakReveal(q);
       if (q.inputMode === 'choice') {
         $$('.choice').forEach(b => {
           if (decodeURIComponent(b.dataset.val) === String(q.answer)) b.classList.add('correct-flash');
@@ -394,10 +501,9 @@
         });
       }
     }
-    // 禁用输入
-    $$('.key, .choice, #btnSubmit').forEach(b => b.disabled = true);
+    $$('.key, .choice, .lkey, #btnSubmit, #btnClear').forEach(b => b.disabled = true);
 
-    const delay = isCorrect ? 750 : 1500;
+    const delay = isCorrect ? (isEnglish() ? 950 : 750) : 1600;
     setTimeout(() => {
       s.idx++;
       s.locked = false;
@@ -406,7 +512,16 @@
     }, delay);
   }
 
+  // 揭示时朗读正确英文（词义题读英文答案；拼写/对话读 speak）
+  function speakReveal(q) {
+    const text = q.speakOnReveal || q.speak || (/^[a-zA-Z' .!?]+$/.test(String(q.answer)) ? q.answer : '');
+    if (text) setTimeout(() => Sound.speak(text), 150);
+  }
+
   function checkAnswer(q, rawVal) {
+    if (q.inputMode === 'spell') {
+      return String(rawVal).toLowerCase().trim() === String(q.answer).toLowerCase().trim();
+    }
     if (q.inputMode === 'choice') return String(rawVal) === String(q.answer);
     const num = parseFloat(rawVal);
     if (isNaN(num)) return false;
@@ -415,8 +530,13 @@
   }
 
   function displayAnswer(q) {
-    if (q.inputMode === 'choice') return String(q.answer);
+    if (q.inputMode === 'choice' || q.inputMode === 'spell') return String(q.answer);
     return q.decimals > 0 ? q.answer.toFixed(q.decimals) : String(q.answer);
+  }
+
+  // 错题回顾里题干去掉 HTML 标签
+  function plainQ(q) {
+    return String(q.text).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
   }
 
   // ================= 结算 =================
@@ -428,13 +548,13 @@
     const accuracy = s.correct / total;
     const elapsed = (performance.now() - s.startAt) / 1000;
     const avgSec = elapsed / total;
-    const result = Store.recordResult(s.level.id, s.level.type, s.correct, total, avgSec);
+    const result = Store.recordResult(s.subjectId, s.level.id, s.level.type, s.correct, total, avgSec);
     const stars = result.newStars;
 
     if (stars >= 1) Sound.SFX.win(); else Sound.SFX.wrong();
 
-    const nextLevel = getNextLevel(s.level.id);
-    const canNext = nextLevel && Store.isUnlocked(nextLevel.id);
+    const nextLevel = getNextLevel(s.subjectId, s.level.id);
+    const canNext = nextLevel && Store.isUnlocked(s.subjectId, nextLevel.id);
 
     let badgeHtml = '';
     if (result.newBadges && result.newBadges.length) {
@@ -446,7 +566,7 @@
 
     const wrongReview = s.wrongItems.length
       ? '<details class="wrong-review"><summary>看看错题 (' + s.wrongItems.length + ')</summary>' +
-        s.wrongItems.map(w => '<div class="wrong-row">' + w.text + ' = <b>' + w.answer + '</b></div>').join('') +
+        s.wrongItems.map(w => '<div class="wrong-row">' + esc(w.text) + ' → <b>' + esc(w.answer) + '</b></div>').join('') +
         '</details>'
       : '<div class="all-correct">🎉 全部答对，太厉害啦！</div>';
 
@@ -476,7 +596,6 @@
     );
 
     if (stars >= 1) burstConfetti();
-    // 星星逐个点亮动画
     animateResultStars(stars);
 
     if (canNext) $('#btnNext').addEventListener('click', () => { Sound.SFX.click(); renderLevelIntro(nextLevel.id); });
@@ -496,22 +615,20 @@
     });
   }
 
-  function getNextLevel(levelId) {
-    // 只在同一年级(世界)内找下一关；年级最后一关无“下一关”，引导回地图
-    for (const w of Levels.WORLDS) {
+  function getNextLevel(subjectId, levelId) {
+    const worlds = Subjects.get(subjectId).worlds;
+    for (const w of worlds) {
       const idx = w.levels.findIndex(l => l.id === levelId);
       if (idx === -1) continue;
-      if (idx < w.levels.length - 1) {
-        return Object.assign({ worldId: w.id }, w.levels[idx + 1]);
-      }
+      if (idx < w.levels.length - 1) return Object.assign({ worldId: w.id }, w.levels[idx + 1]);
       return null;
     }
     return null;
   }
 
-  // ================= 徽章墙 =================
+  // ================= 徽章墙（当前科目） =================
   function renderBadges() {
-    const defs = Store.badgeDefs();
+    const defs = Store.badgeDefs(curSubject);
     const cards = defs.map(b => {
       const owned = Store.hasBadge(b.id);
       return '<div class="badge-card' + (owned ? ' owned' : '') + '">' +
@@ -520,23 +637,24 @@
       '</div>';
     }).join('');
 
-    const weak = Store.weakestType();
+    const weak = Store.weakestType(curSubject);
     let weakHtml = '';
     if (weak) {
-      const lvl = Levels.flatLevels().find(l => l.type === weak.type);
+      const lvl = Subjects.flatLevels(curSubject).find(l => l.type === weak.type);
       weakHtml = '<div class="weak-tip">📊 需要加强：<b>' + (lvl ? lvl.name : weak.type) +
         '</b>（错误率 ' + Math.round(weak.wrongRate * 100) + '%），多练练就掌握啦！</div>';
     }
 
+    const sub = Subjects.get(curSubject);
     show(
       '<header class="topbar">' +
         '<button class="icon-btn" id="btnBack">⬅️</button>' +
-        '<div class="brand">🏅 我的徽章墙</div>' +
-        '<div class="topbar-right"><span class="star-count">⭐ ' + Store.totalStars() + '</span></div>' +
+        '<div class="brand">🏅 ' + sub.name + '徽章墙</div>' +
+        '<div class="topbar-right"><span class="star-count">⭐ ' + Store.totalStars(curSubject) + '</span></div>' +
       '</header>' +
       '<div class="badge-wall">' + cards + '</div>' +
       weakHtml +
-      '<div class="stat-summary">累计答对 <b>' + Store.get().stats.totalCorrect + '</b> 题</div>'
+      '<div class="stat-summary">累计答对 <b>' + Store.totalCorrectOf(curSubject) + '</b> 题</div>'
     );
     $('#btnBack').addEventListener('click', () => { Sound.SFX.click(); renderMap(); });
   }
@@ -550,10 +668,11 @@
           '<div class="menu-list">' +
             '<button class="btn" id="mSound">' + (Store.get().settings.sound ? '🔊 音效：开' : '🔇 音效：关') + '</button>' +
             '<button class="btn" id="mBadges">🏅 查看徽章墙</button>' +
-            '<button class="btn danger" id="mReset">🗑️ 清空所有进度</button>' +
+            '<button class="btn" id="mResetSub">🧹 清空本科目进度</button>' +
+            '<button class="btn danger" id="mReset">🗑️ 清空全部进度</button>' +
           '</div>' +
           '<button class="btn ghost" id="mBack">返回地图</button>' +
-          '<p class="version">口算太空大冒险 v1.0 · 纯本地存档</p>' +
+          '<p class="version">学习大冒险 v2.0 · 数学 + 英语 · 纯本地存档</p>' +
         '</div>' +
       '</div>'
     );
@@ -562,10 +681,17 @@
       $('#mSound').textContent = Store.get().settings.sound ? '🔊 音效：开' : '🔇 音效：关';
     });
     $('#mBadges').addEventListener('click', () => { Sound.SFX.click(); renderBadges(); });
-    $('#mReset').addEventListener('click', () => {
-      if (confirm('确定清空全部闯关进度和徽章吗？此操作无法撤销！')) {
-        Store.reset();
+    $('#mResetSub').addEventListener('click', () => {
+      const name = Subjects.get(curSubject).name;
+      if (confirm('确定清空【' + name + '】的全部进度和徽章吗？此操作无法撤销！')) {
+        Store.reset(curSubject);
         renderMap();
+      }
+    });
+    $('#mReset').addEventListener('click', () => {
+      if (confirm('确定清空数学和英语的全部进度吗？此操作无法撤销！')) {
+        Store.reset();
+        renderHome();
       }
     });
     $('#mBack').addEventListener('click', () => { Sound.SFX.click(); renderMap(); });
@@ -635,8 +761,7 @@
 
   // ================= 启动 =================
   function init() {
-    renderMap();
-    // 首次任意点击唤醒音频
+    renderHome();
     document.body.addEventListener('pointerdown', () => Sound.unlock(), { once: true });
   }
 

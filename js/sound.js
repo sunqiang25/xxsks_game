@@ -64,5 +64,46 @@
     if (c && c.state === 'suspended') c.resume();
   }
 
-  global.Sound = { SFX: SFX, unlock: unlock };
+  // ---------- 英文朗读：Web Speech API ----------
+  let enVoice = null;
+  let voicesReady = false;
+  function pickVoice() {
+    const synth = global.speechSynthesis;
+    if (!synth) return;
+    const list = synth.getVoices() || [];
+    if (!list.length) return;
+    // 优先英式/美式女声，其次任意 en 嗓音
+    enVoice =
+      list.find(v => /en(-|_)?(US|GB)/i.test(v.lang) && /female|Samantha|Karen|Google US/i.test(v.name)) ||
+      list.find(v => /^en/i.test(v.lang)) ||
+      null;
+    voicesReady = true;
+  }
+  if (global.speechSynthesis) {
+    pickVoice();
+    // 部分浏览器嗓音异步加载
+    global.speechSynthesis.onvoiceschanged = pickVoice;
+  }
+
+  function supportsSpeech() { return !!global.speechSynthesis && !!global.SpeechSynthesisUtterance; }
+
+  // 朗读英文单词/句子（受音效开关控制）
+  function speak(text, opts) {
+    if (!text || !enabled() || !supportsSpeech()) return false;
+    try {
+      const synth = global.speechSynthesis;
+      synth.cancel(); // 打断上一段，避免堆积
+      if (!voicesReady) pickVoice();
+      const u = new global.SpeechSynthesisUtterance(String(text));
+      u.lang = (enVoice && enVoice.lang) || 'en-US';
+      if (enVoice) u.voice = enVoice;
+      u.rate = (opts && opts.rate) || 0.85; // 稍慢，便于小朋友听清
+      u.pitch = (opts && opts.pitch) || 1.05;
+      u.volume = 1;
+      synth.speak(u);
+      return true;
+    } catch (e) { return false; }
+  }
+
+  global.Sound = { SFX: SFX, unlock: unlock, speak: speak, supportsSpeech: supportsSpeech };
 })(window);
