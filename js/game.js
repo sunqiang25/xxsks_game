@@ -186,20 +186,38 @@
     if (el) el.textContent = !cur ? '🔊' : '🔇';
   }
 
+  // 难度挡位 → 时间倍率（乘到每题建议秒数上）
+  const DIFF_OPTS = [
+    { v: 'easy', label: '轻松', emoji: '🐢', mult: 1.5 },
+    { v: 'std', label: '标准', emoji: '⭐', mult: 1.0 },
+    { v: 'hard', label: '挑战', emoji: '🔥', mult: 0.7 }
+  ];
+  function diffMult(v) {
+    const d = DIFF_OPTS.find(o => o.v === v);
+    return d ? d.mult : 1.0;
+  }
+  function diffLabel(v) {
+    const d = DIFF_OPTS.find(o => o.v === v);
+    return d ? (d.emoji + ' ' + d.label) : '⭐ 标准';
+  }
+  // 每题倒计时秒数 = 题目建议 sec × 难度倍率；无 sec 时按题型兜底
+  function questionSec(q, difficulty) {
+    let base = q.sec;
+    if (!base) {
+      if (q.inputMode === 'spell') base = 20;
+      else if (q.long) base = 30;
+      else base = 12;
+    }
+    return Math.max(3, Math.ceil(base * diffMult(difficulty)));
+  }
+
   // ================= 关卡开始前介绍 =================
   function renderLevelIntro(levelId) {
     const level = Subjects.findLevel(curSubject, levelId);
     const rec = Store.levelRecord(curSubject, levelId);
-    const savedLimit = Store.get().settings.timeLimit || 0;
-    const TIME_OPTS = [
-      { v: 0, label: '不限时', emoji: '🐢' },
-      { v: 5, label: '5秒', emoji: '⚡' },
-      { v: 10, label: '10秒', emoji: '🔥' },
-      { v: 20, label: '20秒', emoji: '⏱️' },
-      { v: 30, label: '30秒', emoji: '🕐' }
-    ];
-    const timeBtns = TIME_OPTS.map(o =>
-      '<button class="time-opt' + (o.v === savedLimit ? ' active' : '') + '" data-t="' + o.v + '">' +
+    const savedDiff = Store.get().settings.difficulty || 'std';
+    const diffBtns = DIFF_OPTS.map(o =>
+      '<button class="time-opt' + (o.v === savedDiff ? ' active' : '') + '" data-d="' + o.v + '">' +
         '<span class="time-emoji">' + o.emoji + '</span>' + o.label +
       '</button>'
     ).join('');
@@ -213,8 +231,8 @@
           '<div class="intro-stars">当前最好：' + renderStarIcons(rec.stars || 0) +
             (rec.best ? ' <span class="best">最高分 ' + rec.best + '</span>' : '') + '</div>' +
           '<div class="time-picker">' +
-            '<div class="time-label">⏳ 每题倒计时</div>' +
-            '<div class="time-opts">' + timeBtns + '</div>' +
+            '<div class="time-label">🎚️ 选择难度（每题都有倒计时）</div>' +
+            '<div class="time-opts">' + diffBtns + '</div>' +
           '</div>' +
           '<div class="intro-rules">🎯 全对得 <b>3⭐</b>　答对八成 <b>2⭐</b>　过关 <b>1⭐</b></div>' +
           '<div class="intro-btns">' +
@@ -229,7 +247,7 @@
         Sound.SFX.click();
         $$('.time-opt').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        Store.setSetting('timeLimit', parseInt(btn.dataset.t, 10));
+        Store.setSetting('difficulty', btn.dataset.d);
       });
     });
     $('#btnStart').addEventListener('click', () => { Sound.SFX.click(); startLevel(level); });
@@ -251,14 +269,14 @@
       maxCombo: 0,
       score: 0,
       startAt: performance.now(),
-      timeLimit: Store.get().settings.timeLimit || 0,
+      difficulty: Store.get().settings.difficulty || 'std',
       timedOut: 0,
       wrongItems: []
     };
     renderQuestion();
   }
 
-  function isEnglish() { return session && session.subjectId === 'english'; }
+  function isEnglish() { return session && (session.subjectId === 'en_yl' || session.subjectId === 'en_ns'); }
 
   function renderQuestion() {
     const s = session;
@@ -293,6 +311,7 @@
     const qClass = isEnglish() ? 'question en pop' : 'question pop';
     const qSuffix = isEnglish() ? '' : ' =';
 
+    s.curSec = questionSec(q, s.difficulty);
     show(
       '<div class="quiz">' +
         '<div class="quiz-top">' +
@@ -300,7 +319,7 @@
           '<div class="pbar"><div class="pbar-fill" style="width:' + progress + '%"></div></div>' +
           '<div class="qcount">' + (s.idx + 1) + '/' + s.questions.length + '</div>' +
         '</div>' +
-        (s.timeLimit > 0 ? timerHtml(s.timeLimit) : '') +
+        timerHtml(s.curSec) +
         '<div class="combo-area">' + comboHtml(s.combo) + '</div>' +
         (q.hint ? '<div class="q-hint">' + q.hint + '</div>' : '') +
         '<div class="' + qClass + '" id="qText">' + q.text + qSuffix + speakBtn + '</div>' +
@@ -313,7 +332,7 @@
       Sound.SFX.click();
       stopTimer();
       if (confirm('确定退出本关吗？进度不会保存哦～')) renderMap();
-      else if (s.timeLimit > 0 && !s.locked) startTimer();
+      else if (!s.locked) startTimer();
     });
 
     if (canSpeak) {
@@ -338,7 +357,7 @@
       bindKeypad(q);
     }
     s.qStartAt = performance.now();
-    if (s.timeLimit > 0) startTimer();
+    startTimer();
   }
 
   // ---------- 倒计时 ----------
@@ -354,7 +373,7 @@
 
   function startTimer() {
     const s = session;
-    if (!s || s.timeLimit <= 0) return;
+    if (!s || !s.curSec || s.curSec <= 0) return;
     stopTimer();
     const arc = $('#timerArc');
     const numEl = $('#timerNum');
@@ -362,9 +381,9 @@
     const CIRC = 2 * Math.PI * 19;
     if (arc) { arc.style.strokeDasharray = CIRC; arc.style.strokeDashoffset = '0'; }
 
-    const totalMs = s.timeLimit * 1000;
+    const totalMs = s.curSec * 1000;
     s.timerStart = performance.now();
-    let lastTick = s.timeLimit;
+    let lastTick = s.curSec;
 
     s._timer = setInterval(() => {
       const elapsed = performance.now() - s.timerStart;
@@ -628,7 +647,7 @@
         '<div class="result-card pop">' +
           '<div class="result-stars" id="resultStars">' + bigStars(stars) + '</div>' +
           '<h1>' + (stars >= 1 ? '闯关成功！' : '再试一次吧') + '</h1>' +
-          (s.timeLimit > 0 ? '<div class="mode-tag">⏳ 限时模式 · 每题 ' + s.timeLimit + ' 秒</div>' : '') +
+          '<div class="mode-tag">🎚️ 难度：' + diffLabel(s.difficulty) + '</div>' +
           '<div class="result-stats">' +
             '<div><span>' + s.correct + '/' + total + '</span>答对</div>' +
             '<div><span>' + s.score + '</span>得分</div>' +

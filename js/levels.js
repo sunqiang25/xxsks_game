@@ -13,7 +13,9 @@
         { id: 'w1l1', name: '10以内加法', type: 'add10', count: 10, emoji: '🚀' },
         { id: 'w1l2', name: '10以内减法', type: 'sub10', count: 10, emoji: '🛰️' },
         { id: 'w1l3', name: '20以内进位加', type: 'add20', count: 10, emoji: '⭐' },
-        { id: 'w1l4', name: '20以内退位减', type: 'sub20', count: 10, emoji: '🌟' }
+        { id: 'w1l4', name: '20以内退位减', type: 'sub20', count: 10, emoji: '🌟' },
+        { id: 'w1l5', name: '数图形', type: 'shape_g1', count: 8, emoji: '🔺' },
+        { id: 'w1l6', name: '应用题', type: 'word_g1', count: 8, emoji: '🧠' }
       ]
     },
     {
@@ -23,7 +25,9 @@
         { id: 'w2l1', name: '100以内加法', type: 'add100', count: 10, emoji: '⛏️' },
         { id: 'w2l2', name: '100以内减法', type: 'sub100', count: 10, emoji: '🪨' },
         { id: 'w2l3', name: '乘法口诀', type: 'mulTable', count: 12, emoji: '✖️' },
-        { id: 'w2l4', name: '表内除法', type: 'divTable', count: 12, emoji: '➗' }
+        { id: 'w2l4', name: '表内除法', type: 'divTable', count: 12, emoji: '➗' },
+        { id: 'w2l5', name: '认识图形', type: 'shape_g2', count: 8, emoji: '📐' },
+        { id: 'w2l6', name: '应用题', type: 'word_g2', count: 8, emoji: '🧠' }
       ]
     },
     {
@@ -32,7 +36,9 @@
       levels: [
         { id: 'w3l1', name: '三位数加减', type: 'addSub3', count: 10, emoji: '🌀' },
         { id: 'w3l2', name: '一位×两位数', type: 'mul1by2', count: 10, emoji: '⚡' },
-        { id: 'w3l3', name: '除以一位数', type: 'divExact3', count: 10, emoji: '🌩️' }
+        { id: 'w3l3', name: '除以一位数', type: 'divExact3', count: 10, emoji: '🌩️' },
+        { id: 'w3l4', name: '周长面积', type: 'shape_g3', count: 8, emoji: '📐' },
+        { id: 'w3l5', name: '应用题', type: 'word_g3', count: 8, emoji: '🧠' }
       ]
     },
     {
@@ -42,7 +48,8 @@
         { id: 'w4l1', name: '两位×两位数', type: 'mul2by2', count: 8, emoji: '💫' },
         { id: 'w4l2', name: '三位×一位数', type: 'mul3by1', count: 8, emoji: '🔮' },
         { id: 'w4l3', name: '除以两位数', type: 'divByTwo', count: 8, emoji: '🌌' },
-        { id: 'w4l4', name: '四则混合', type: 'mixed4', count: 8, emoji: '🎯' }
+        { id: 'w4l4', name: '四则混合', type: 'mixed4', count: 8, emoji: '🎯' },
+        { id: 'w4l5', name: '应用题', type: 'word_g4', count: 8, emoji: '🧠' }
       ]
     },
     {
@@ -51,7 +58,8 @@
       levels: [
         { id: 'w5l1', name: '小数加减', type: 'decAddSub', count: 10, emoji: '💧' },
         { id: 'w5l2', name: '小数乘法', type: 'decMul', count: 8, emoji: '🌊' },
-        { id: 'w5l3', name: '同分母分数', type: 'fracSameDenom', count: 8, emoji: '❄️' }
+        { id: 'w5l3', name: '同分母分数', type: 'fracSameDenom', count: 8, emoji: '❄️' },
+        { id: 'w5l4', name: '应用题', type: 'word_g5', count: 8, emoji: '🧠' }
       ]
     },
     {
@@ -60,7 +68,8 @@
       levels: [
         { id: 'w6l1', name: '分数乘法', type: 'fracMul', count: 8, emoji: '🌠' },
         { id: 'w6l2', name: '百分数', type: 'percent', count: 8, emoji: '💠' },
-        { id: 'w6l3', name: '综合运算', type: 'mixedAdv', count: 8, emoji: '👑' }
+        { id: 'w6l3', name: '综合运算', type: 'mixedAdv', count: 8, emoji: '👑' },
+        { id: 'w6l4', name: '应用题', type: 'word_g6', count: 8, emoji: '🧠' }
       ]
     }
   ];

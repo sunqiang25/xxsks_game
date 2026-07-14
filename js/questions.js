@@ -218,8 +218,107 @@
         () => { const c = randInt(2, 9), q = randInt(3, 20), r = randInt(1, 30); return kq((c * q) + ' ÷ ' + c + ' + ' + r, q + r); }
       ];
       return pick(forms)();
+    },
+
+    // ===== 应用题（文字题，答案为整数，键盘作答）=====
+    word_g1() { // 一年级：20 以内一步加减
+      const forms = [
+        () => { const a = randInt(3, 12), b = randInt(2, 8); return wq('小明有 ' + a + ' 颗糖🍬，妈妈又给了 ' + b + ' 颗，<br>现在一共有几颗糖？', a + b); },
+        () => { const a = randInt(8, 18), b = randInt(2, a - 1); return wq('树上有 ' + a + ' 只小鸟🐦，飞走了 ' + b + ' 只，<br>还剩几只小鸟？', a - b); },
+        () => { const a = randInt(3, 9), b = randInt(2, 8); return wq('停车场有 ' + a + ' 辆红色🚗和 ' + b + ' 辆蓝色🚙，<br>一共有几辆车？', a + b); },
+        () => { const a = randInt(10, 20), b = randInt(3, 9); return wq('小红有 ' + a + ' 支铅笔✏️，送给同学 ' + b + ' 支，<br>还剩几支？', a - b); }
+      ];
+      return pick(forms)();
+    },
+    word_g2() { // 二年级：100 以内加减 + 乘法口诀应用
+      const forms = [
+        () => { const a = randInt(3, 9), b = randInt(2, 9); return wq('每盒有 ' + a + ' 支彩笔🖍️，' + b + ' 盒一共有几支？', a * b); },
+        () => { const a = randInt(30, 60), b = randInt(10, a - 5); return wq('果园摘了 ' + a + ' 个苹果🍎，卖掉 ' + b + ' 个，<br>还剩几个？', a - b); },
+        () => { const a = randInt(2, 9), b = randInt(2, 9); return wq('一排有 ' + a + ' 个座位💺，' + b + ' 排一共几个座位？', a * b); },
+        () => { const a = randInt(15, 45), b = randInt(10, 40); return wq('班里有男生 ' + a + ' 人，女生 ' + b + ' 人，<br>全班一共几人？', a + b); }
+      ];
+      return pick(forms)();
+    },
+    word_g3() { // 三年级：乘除 + 三位数加减
+      const forms = [
+        () => { const box = randInt(3, 8), per = randInt(4, 9); return wq('书架每层放 ' + per + ' 本书📚，' + box + ' 层一共放几本？', box * per); },
+        () => { const per = pick([2, 3, 4, 5, 6]); const q = randInt(3, 9); const g = per * q; return wq('有 ' + g + ' 块饼干🍪，平均分给 ' + per + ' 个小朋友，<br>每人分几块？', q); },
+        () => { const a = randInt(120, 480), b = randInt(50, 200); return wq('图书馆上午借出 ' + a + ' 本书，下午又借出 ' + b + ' 本，<br>一共借出几本？', a + b); },
+        () => { const price = randInt(3, 9), n = randInt(3, 8); return wq('一个面包🍞 ' + price + ' 元，买 ' + n + ' 个要多少元？', price * n); }
+      ];
+      return pick(forms)();
+    },
+    word_g4() { // 四年级：两步混合应用
+      const forms = [
+        () => { const per = randInt(5, 12), box = randInt(3, 6), eat = randInt(2, 8); return wq('每袋 ' + per + ' 颗巧克力🍫，买了 ' + box + ' 袋，<br>吃掉 ' + eat + ' 颗，还剩几颗？', per * box - eat); },
+        () => { const per = pick([5, 10, 20]); const n = randInt(3, 8); const total = per * n; return wq('一共 ' + total + ' 元💰，每本笔记本 ' + per + ' 元，<br>能买几本？', n); },
+        () => { const speed = randInt(40, 80), h = randInt(2, 5); return wq('汽车每小时行 ' + speed + ' 千米🚙，<br>行了 ' + h + ' 小时，一共行多少千米？', speed * h); },
+        () => { const a = randInt(3, 8), b = randInt(3, 8), c = randInt(2, 6); return wq('每排 ' + a + ' 棵树🌳，共 ' + b + ' 排，<br>又种了 ' + c + ' 棵，一共几棵？', a * b + c); }
+      ];
+      return pick(forms)();
+    },
+    word_g5() { // 五年级：小数 + 平均数应用
+      const forms = [
+        () => { const price = (randInt(15, 45) / 10), n = randInt(2, 5); const ans = Math.round(price * n * 10) / 10; return wq('一支笔 ' + price.toFixed(1) + ' 元，买 ' + n + ' 支<br>一共多少元？（结果保留一位小数）', ans, 1); },
+        () => { const avg = randInt(75, 95); const sum = avg * 3; return wq('三次考试平均分 ' + avg + ' 分，<br>三次的总分是多少分？', sum); },
+        () => { const w = (randInt(20, 50) / 10), n = randInt(3, 6); const ans = Math.round(w * n * 10) / 10; return wq('每袋米重 ' + w.toFixed(1) + ' 千克，' + n + ' 袋<br>一共重多少千克？（保留一位小数）', ans, 1); }
+      ];
+      return pick(forms)();
+    },
+    word_g6() { // 六年级：分数/百分数应用
+      const forms = [
+        () => { const total = randInt(3, 10) * 20, pct = pick([10, 20, 25, 50]); return wq('一本书共 ' + total + ' 页📖，已经读了 ' + pct + '%，<br>读了多少页？', total * pct / 100); },
+        () => { const total = randInt(3, 8) * 12, frac = pick([[1, 2], [1, 3], [1, 4], [2, 3]]); const ans = total * frac[0] / frac[1]; return wq('果园有 ' + total + ' 棵果树🌳，其中 ' + frac[0] + '/' + frac[1] + ' 是苹果树，<br>苹果树有几棵？', ans); },
+        () => { const price = randInt(5, 20) * 10, off = pick([10, 20, 30]); return wq('一件衣服👕原价 ' + price + ' 元，<br>打 ' + (100 - off) + ' 折后便宜了多少元？', price * off / 100); }
+      ];
+      return pick(forms)();
+    },
+
+    // ===== 图形题（用 emoji 拼图，选择或键盘）=====
+    shape_g1() { // 一年级：数图形个数
+      const items = [
+        { e: '🔺', zh: '三角形' }, { e: '⬛', zh: '正方形' }, { e: '⭕', zh: '圆形' }, { e: '⭐', zh: '星星' }
+      ];
+      const target = pick(items);
+      const n = randInt(3, 7);
+      const other = pick(items.filter(x => x.e !== target.e));
+      const m = randInt(2, 5);
+      let row = (target.e.repeat(n) + other.e.repeat(m)).split('');
+      // 打乱
+      for (let i = row.length - 1; i > 0; i--) { const j = randInt(0, i); [row[i], row[j]] = [row[j], row[i]]; }
+      return kqShape('图中有几个' + target.zh + target.e + '？<br><span class="shape-art">' + row.join('') + '</span>', n);
+    },
+    shape_g2() { // 二年级：认识图形的边数
+      const shapes = [
+        { e: '🔺', zh: '三角形', sides: 3 }, { e: '⬛', zh: '正方形', sides: 4 },
+        { e: '▬', zh: '长方形', sides: 4 }, { e: '⬠', zh: '五边形', sides: 5 }, { e: '⬡', zh: '六边形', sides: 6 }
+      ];
+      const s = pick(shapes);
+      const opts = buildOptions(s.sides, [3, 4, 5, 6].filter(x => x !== s.sides), (k) => s.sides + k);
+      return cqShape('<span class="shape-art">' + s.e + '</span>' + s.zh + '有几条边？', s.sides, opts);
+    },
+    shape_g3() { // 三年级：长方形/正方形周长
+      const forms = [
+        () => { const a = randInt(3, 12), b = randInt(3, 12); return kqShape('长方形长 ' + a + ' 厘米，宽 ' + b + ' 厘米，<br>周长是多少厘米？', (a + b) * 2); },
+        () => { const a = randInt(3, 15); return kqShape('正方形⬛边长 ' + a + ' 厘米，<br>周长是多少厘米？', a * 4); },
+        () => { const a = randInt(3, 12), b = randInt(3, 12); return kqShape('长方形长 ' + a + ' 厘米，宽 ' + b + ' 厘米，<br>面积是多少平方厘米？', a * b); }
+      ];
+      return pick(forms)();
     }
   };
+
+  // 应用题构造器：keypad，带 40 秒建议时长；decimals 可选
+  function wq(text, answer, decimals) {
+    return { text: text, answer: Number(answer), inputMode: 'keypad', decimals: decimals || 0, sec: 40 };
+  }
+  // 图形题（keypad）
+  function kqShape(text, answer) {
+    return { text: text, answer: Number(answer), inputMode: 'keypad', decimals: 0, sec: 35 };
+  }
+  // 图形题（choice）
+  function cqShape(text, answer, options) {
+    return { text: text, answer: String(answer), inputMode: 'choice', options: options, sec: 35 };
+  }
 
   // 生成一关的题目，尽量避免连续重复
   function generate(type, count) {

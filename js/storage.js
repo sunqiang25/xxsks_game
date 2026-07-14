@@ -6,7 +6,7 @@
 //     english: { levels:{...}, stats:{...} }
 //   },
 //   badges: [ 'math:first_win', 'english:stars10', 'combo10', ... ],  // 科目相关徽章带前缀
-//   settings: { sound, theme, timeLimit }
+//   settings: { sound, theme, difficulty }
 // }
 
 (function (global) {
@@ -21,7 +21,7 @@
     return {
       subjects: { math: emptySubject(), english: emptySubject() },
       badges: [],
-      settings: { sound: true, theme: 'space', timeLimit: 0 }
+      settings: { sound: true, theme: 'space', difficulty: 'std' }
     };
   }
 

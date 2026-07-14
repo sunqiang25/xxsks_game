@@ -190,6 +190,52 @@
     { q: 'What would you like?', zh: '问你想要什么', a: "I'd like some rice.", distractors: ["I'm fine.", "It's Monday.", 'Yes, I do.'] }
   ];
 
+  // ============ 生活情景对话库（贴合真实生活场景）============
+  // { g: 年级档 low(1-2)/mid(3-4)/high(5-6), scene: emoji+场景, ctx: 英文情景, zh: 中文提示, a: 正确回答, distractors:[...] }
+  const LIFE_DIALOGS = [
+    // —— 低年级 low：打招呼、课堂、简单购物 ——
+    { g: 'low', scene: '🏫 在学校', ctx: 'You meet your teacher in the morning.', zh: '早上遇到老师该怎么问候', a: 'Good morning, Miss Li!', distractors: ['Good night!', 'Bye bye!', "It's red."] },
+    { g: 'low', scene: '🏫 在课堂', ctx: 'You want to go to the toilet in class.', zh: '上课想去洗手间，举手说', a: 'May I go to the toilet?', distractors: ['I like apples.', "It's a dog.", 'Thank you.'] },
+    { g: 'low', scene: '🛒 在商店', ctx: 'You want to buy a pencil. The shopkeeper asks "Can I help you?"', zh: '你想买一支铅笔', a: 'I want a pencil, please.', distractors: ["I'm nine.", "It's sunny.", 'Good night.'] },
+    { g: 'low', scene: '🎂 生日会', ctx: "It's your friend's birthday.", zh: '朋友过生日，你对他说', a: 'Happy birthday!', distractors: ['Good morning.', 'Sorry.', 'How much?'] },
+    { g: 'low', scene: '🍎 在家', ctx: 'Mum asks: "Do you want an apple?"', zh: '妈妈问你要不要苹果，你想要', a: 'Yes, please.', distractors: ['No, I am.', "It's red.", 'See you.'] },
+    { g: 'low', scene: '👋 放学', ctx: 'School is over. You say goodbye to your friend.', zh: '放学和同学道别', a: 'See you tomorrow!', distractors: ['Good morning!', 'How old are you?', 'I like it.'] },
+    // —— 中年级 mid：问路、点餐、购物付钱 ——
+    { g: 'mid', scene: '🍔 在快餐店', ctx: 'The waiter asks: "What would you like to eat?"', zh: '服务员问你想吃什么', a: "I'd like a hamburger.", distractors: ['I am fine.', "It's Monday.", 'You are welcome.'] },
+    { g: 'mid', scene: '🛒 超市付钱', ctx: 'You want to know the price of the milk.', zh: '你想问牛奶多少钱', a: 'How much is it?', distractors: ['How old are you?', 'What time is it?', 'Where are you?'] },
+    { g: 'mid', scene: '🗺️ 问路', ctx: 'You are lost. You want to find the library.', zh: '你迷路了，想问图书馆怎么走', a: 'Where is the library?', distractors: ['How are you?', 'What colour is it?', 'How many books?'] },
+    { g: 'mid', scene: '🍦 买冰淇淋', ctx: 'The seller asks: "How many ice creams?"', zh: '你想买两个冰淇淋', a: 'Two, please.', distractors: ["It's cold.", 'I am ten.', 'Yes, I do.'] },
+    { g: 'mid', scene: '📞 打电话', ctx: 'You call your friend. He picks up.', zh: '你打电话找朋友 Tom', a: 'Hello, is that Tom?', distractors: ['Good night, Tom.', 'I am Tom.', 'How much is Tom?'] },
+    { g: 'mid', scene: '🚌 坐公交', ctx: 'You want to know if this bus goes to the zoo.', zh: '想问这辆车去不去动物园', a: 'Does this bus go to the zoo?', distractors: ['I like the zoo.', 'The zoo is big.', 'How old is the zoo?'] },
+    // —— 高年级 high：看病、求助、餐厅、失物 ——
+    { g: 'high', scene: '🏥 看医生', ctx: 'You feel sick. The doctor asks what is wrong.', zh: '医生问你怎么了，你头疼', a: 'I have a headache.', distractors: ["I'm happy.", "It's a nice day.", 'I like doctors.'] },
+    { g: 'high', scene: '🆘 求助', ctx: 'You fall down and hurt your leg. You need help.', zh: '你摔倒了需要帮忙', a: 'Could you help me, please?', distractors: ['You are welcome.', 'Here you are.', 'Never mind.'] },
+    { g: 'high', scene: '🍽️ 在餐厅', ctx: 'The waiter asks: "Are you ready to order?"', zh: '服务员问你准备好点餐了吗', a: "Yes, I'd like some noodles.", distractors: ['No, I am hungry.', "It's delicious.", 'I am a waiter.'] },
+    { g: 'high', scene: '🎒 丢东西', ctx: 'You lost your bag. You ask the guard for help.', zh: '你的书包丢了，向保安求助', a: "I can't find my bag.", distractors: ['My bag is nice.', 'I have a bag.', 'The bag is red.'] },
+    { g: 'high', scene: '🏨 问洗手间', ctx: 'You are in a restaurant and need the washroom.', zh: '在餐厅想问洗手间在哪', a: 'Excuse me, where is the washroom?', distractors: ['How much is the washroom?', 'I like the washroom.', 'The washroom is nice.'] },
+    { g: 'high', scene: '🛍️ 买衣服', ctx: 'The shop assistant asks: "What size do you want?"', zh: '店员问你要多大尺码', a: "Size M, please.", distractors: ['I am fine, thanks.', "It's Monday.", 'You are welcome.'] }
+  ];
+
+  // 生活情景对话生成器：按年级档筛选，输出与 dialog() 同构的选择题
+  function lifeDialog(tier) {
+    let pool = LIFE_DIALOGS.filter(d => d.g === tier);
+    if (!pool.length) pool = LIFE_DIALOGS;
+    const d = pick(pool);
+    const opts = shuffle([d.a].concat(d.distractors.slice(0, 3)));
+    return {
+      inputMode: 'choice',
+      text: '<span class="en-scene">' + d.scene + '</span>' +
+            '<span class="en-context">' + d.ctx + '</span>' +
+            '<span class="en-zh">（' + d.zh + '）</span>',
+      speak: d.ctx,
+      answer: d.a,
+      options: opts,
+      hint: '选出最合适的英文回答',
+      long: true,
+      sec: 30
+    };
+  }
+
   // ============ 语法题库 ============
   // be 动词、a/an、单复数、一般现在时第三人称
   function grammarPool() {
@@ -319,7 +365,8 @@
       answer: d.a,
       options: opts,
       hint: '选出正确的回答',
-      long: true
+      long: true,
+      sec: 20
     };
   }
 
@@ -327,7 +374,7 @@
   function grammar() {
     const g = pick(GRAMMAR);
     const opts = shuffle(g.opts.slice(0, 4));
-    return { inputMode: 'choice', text: g.text, answer: g.a, options: opts, hint: '选出正确的词', long: true };
+    return { inputMode: 'choice', text: g.text, answer: g.a, options: opts, hint: '选出正确的词', long: true, sec: 18 };
   }
 
   // 自然拼读（新思维特色）：听发音，选首字母/结尾不发音字母
@@ -393,7 +440,11 @@
     en_g6_nature: () => pick([wordZhToEn(['nature']), wordEnToZh(['nature'])]),
     en_g6_spell: () => spellWord(['clothes', 'job', 'verb', 'place', 'nature']),
     en_g6_dialog: () => dialog(),
-    en_g6_grammar: () => grammar()
+    en_g6_grammar: () => grammar(),
+    // 生活情景对话（按年级档）
+    en_life_low: () => lifeDialog('low'),
+    en_life_mid: () => lifeDialog('mid'),
+    en_life_high: () => lifeDialog('high')
   };
 
   function generate(type, count) {

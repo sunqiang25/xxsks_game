@@ -484,3 +484,52 @@ body::before {
   .letter-pad { grid-template-columns: repeat(6, 1fr); gap: 6px; }
   .lkey { padding: 13px 0; font-size: 19px; }
 }
+
+/* ============================================================ */
+/* ===========  考试型题型：应用题 / 图形题 / 生活对话  ========= */
+/* ============================================================ */
+
+/* 应用题 & 图形题：题干多行、左对齐更易读，字号比纯算式小 */
+.question .word-problem,
+.question.pop .word-problem { font-size: 22px; }
+.question { line-height: 1.4; }
+
+/* 图形题：emoji 图形放大居中展示 */
+.shape-art {
+  display: block;
+  font-size: 44px;
+  letter-spacing: 6px;
+  line-height: 1.3;
+  margin: 12px auto 4px;
+  word-break: break-word;
+}
+
+/* 英语生活情景对话：场景标签 + 情景描述块 */
+.question.en .en-scene {
+  display: inline-block;
+  background: rgba(255,217,61,0.16);
+  border: 1px solid rgba(255,217,61,0.4);
+  color: var(--accent);
+  font-size: 15px; font-weight: 800;
+  padding: 4px 14px; border-radius: 999px;
+  margin-bottom: 12px;
+}
+.question.en .en-context {
+  display: block;
+  font-size: 21px; font-weight: 700; line-height: 1.5;
+  color: #fff;
+  background: rgba(255,255,255,0.06);
+  border-left: 4px solid var(--accent2);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin: 0 auto 6px;
+  max-width: 520px;
+  text-align: left;
+}
+.question.en .en-context + .en-zh { display: block; font-size: 15px; color: var(--muted); font-weight: 600; margin-top: 6px; }
+
+@media (max-width: 380px) {
+  .shape-art { font-size: 34px; letter-spacing: 4px; }
+  .question.en .en-context { font-size: 18px; padding: 10px 12px; }
+  .question .word-problem { font-size: 19px; }
+}

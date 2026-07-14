@@ -21,34 +21,34 @@
 
   // ---------- 译林版：话题交际为主 ----------
   var YL_WORLDS = W('yl', [
-    { grade: '一年级', name: '字母星球', emoji: '🌟', color: '#8ec5ff', desc: '颜色·数字·动物·水果',
-      levels: [['缤纷颜色','en_g1_color',10,'🎨'],['可爱动物','en_g1_animal',10,'🐱'],['数字 1-10','en_g1_number',10,'🔢'],['美味水果','en_g1_fruit',10,'🍎']] },
-    { grade: '二年级', name: '词汇森林', emoji: '🌳', color: '#7dff9b', desc: '文具·身体·家庭·拼写',
-      levels: [['学习文具','en_g2_stationery',10,'✏️'],['身体部位','en_g2_body',10,'👀'],['我的家人','en_g2_family',10,'👨‍👩‍👧'],['拼写小试','en_g2_spell',8,'🔤']] },
-    { grade: '三年级', name: '交流小镇', emoji: '🏘️', color: '#ffd36c', desc: '玩具·交通·日常对话',
-      levels: [['好玩玩具','en_g3_toy',10,'🧸'],['交通工具','en_g3_transport',10,'🚌'],['日常对话','en_g3_dialog',8,'💬'],['拼写进阶','en_g3_spell',8,'✍️']] },
-    { grade: '四年级', name: '生活城市', emoji: '🏙️', color: '#c9a0ff', desc: '房间·衣服·职业',
-      levels: [['房间物品','en_g4_room',10,'🛏️'],['各种衣服','en_g4_clothes',10,'👕'],['职业称呼','en_g4_job',10,'👩‍🏫'],['拼写挑战','en_g4_spell',8,'🔡']] },
+    { grade: '一年级', name: '字母星球', emoji: '🌟', color: '#8ec5ff', desc: '颜色·数字·动物·生活对话',
+      levels: [['缤纷颜色','en_g1_color',10,'🎨'],['可爱动物','en_g1_animal',10,'🐱'],['数字 1-10','en_g1_number',10,'🔢'],['美味水果','en_g1_fruit',10,'🍎'],['生活对话','en_life_low',8,'💬']] },
+    { grade: '二年级', name: '词汇森林', emoji: '🌳', color: '#7dff9b', desc: '文具·身体·家庭·生活对话',
+      levels: [['学习文具','en_g2_stationery',10,'✏️'],['身体部位','en_g2_body',10,'👀'],['我的家人','en_g2_family',10,'👨‍👩‍👧'],['拼写小试','en_g2_spell',8,'🔤'],['生活对话','en_life_low',8,'🛒']] },
+    { grade: '三年级', name: '交流小镇', emoji: '🏘️', color: '#ffd36c', desc: '玩具·交通·生活对话',
+      levels: [['好玩玩具','en_g3_toy',10,'🧸'],['交通工具','en_g3_transport',10,'🚌'],['日常对话','en_g3_dialog',8,'💬'],['拼写进阶','en_g3_spell',8,'✍️'],['生活对话','en_life_mid',8,'🗺️']] },
+    { grade: '四年级', name: '生活城市', emoji: '🏙️', color: '#c9a0ff', desc: '房间·衣服·职业·生活对话',
+      levels: [['房间物品','en_g4_room',10,'🛏️'],['各种衣服','en_g4_clothes',10,'👕'],['职业称呼','en_g4_job',10,'👩‍🏫'],['拼写挑战','en_g4_spell',8,'🔡'],['生活对话','en_life_mid',8,'🍔']] },
     { grade: '五年级', name: '交际山谷', emoji: '⛰️', color: '#6cc6ff', desc: '动词·地点·情景对话',
-      levels: [['动作单词','en_g5_verb',10,'🏃'],['地点场所','en_g5_place',10,'🏫'],['情景对话','en_g5_dialog',8,'🗣️'],['语法入门','en_g5_grammar',8,'📘']] },
+      levels: [['动作单词','en_g5_verb',10,'🏃'],['地点场所','en_g5_place',10,'🏫'],['情景对话','en_g5_dialog',8,'🗣️'],['语法入门','en_g5_grammar',8,'📘'],['生活对话','en_life_high',8,'🏥']] },
     { grade: '六年级', name: '综合王国', emoji: '👑', color: '#ff7eb6', desc: '自然·综合对话·语法',
-      levels: [['自然万物','en_g6_nature',10,'🌍'],['综合对话','en_g6_dialog',8,'💭'],['拼写高手','en_g6_spell',8,'🏆'],['语法综合','en_g6_grammar',8,'📚']] }
+      levels: [['自然万物','en_g6_nature',10,'🌍'],['综合对话','en_g6_dialog',8,'💭'],['拼写高手','en_g6_spell',8,'🏆'],['语法综合','en_g6_grammar',8,'📚'],['生活对话','en_life_high',8,'🛍️']] }
   ]);
 
   // ---------- 新思维：拼读/拼写/语法更重 ----------
   var NS_WORLDS = W('ns', [
-    { grade: '一年级', name: '拼读乐园', emoji: '🔠', color: '#8ec5ff', desc: '颜色·动物·自然拼读',
-      levels: [['缤纷颜色','en_g1_color',10,'🎨'],['可爱动物','en_g1_animal',10,'🐱'],['自然拼读','en_phonics',10,'🔠'],['美味水果','en_g1_fruit',10,'🍎']] },
-    { grade: '二年级', name: '拼写森林', emoji: '🌳', color: '#7dff9b', desc: '文具·身体·拼读拼写',
-      levels: [['学习文具','en_g2_stationery',10,'✏️'],['身体部位','en_g2_body',10,'👀'],['自然拼读','en_phonics',10,'🔠'],['拼写小试','en_g2_spell',8,'🔤']] },
-    { grade: '三年级', name: '词汇小镇', emoji: '🏘️', color: '#ffd36c', desc: '玩具·交通·拼写',
-      levels: [['好玩玩具','en_g3_toy',10,'🧸'],['交通工具','en_g3_transport',10,'🚌'],['拼写进阶','en_g3_spell',10,'✍️'],['日常对话','en_g3_dialog',8,'💬']] },
-    { grade: '四年级', name: '构词城市', emoji: '🏙️', color: '#c9a0ff', desc: '衣服·职业·拼写挑战',
-      levels: [['各种衣服','en_g4_clothes',10,'👕'],['职业称呼','en_g4_job',10,'👩‍🏫'],['房间物品','en_g4_room',10,'🛏️'],['拼写挑战','en_g4_spell',10,'🔡']] },
-    { grade: '五年级', name: '语法山谷', emoji: '⛰️', color: '#6cc6ff', desc: '动词·语法·拼写',
-      levels: [['动作单词','en_g5_verb',10,'🏃'],['语法入门','en_g5_grammar',10,'📘'],['地点场所','en_g5_place',10,'🏫'],['拼写强化','en_g6_spell',8,'✍️']] },
+    { grade: '一年级', name: '拼读乐园', emoji: '🔠', color: '#8ec5ff', desc: '颜色·动物·拼读·生活对话',
+      levels: [['缤纷颜色','en_g1_color',10,'🎨'],['可爱动物','en_g1_animal',10,'🐱'],['自然拼读','en_phonics',10,'🔠'],['美味水果','en_g1_fruit',10,'🍎'],['生活对话','en_life_low',8,'💬']] },
+    { grade: '二年级', name: '拼写森林', emoji: '🌳', color: '#7dff9b', desc: '文具·身体·拼读·生活对话',
+      levels: [['学习文具','en_g2_stationery',10,'✏️'],['身体部位','en_g2_body',10,'👀'],['自然拼读','en_phonics',10,'🔠'],['拼写小试','en_g2_spell',8,'🔤'],['生活对话','en_life_low',8,'🛒']] },
+    { grade: '三年级', name: '词汇小镇', emoji: '🏘️', color: '#ffd36c', desc: '玩具·交通·拼写·生活对话',
+      levels: [['好玩玩具','en_g3_toy',10,'🧸'],['交通工具','en_g3_transport',10,'🚌'],['拼写进阶','en_g3_spell',10,'✍️'],['日常对话','en_g3_dialog',8,'💬'],['生活对话','en_life_mid',8,'🗺️']] },
+    { grade: '四年级', name: '构词城市', emoji: '🏙️', color: '#c9a0ff', desc: '衣服·职业·拼写·生活对话',
+      levels: [['各种衣服','en_g4_clothes',10,'👕'],['职业称呼','en_g4_job',10,'👩‍🏫'],['房间物品','en_g4_room',10,'🛏️'],['拼写挑战','en_g4_spell',10,'🔡'],['生活对话','en_life_mid',8,'🍔']] },
+    { grade: '五年级', name: '语法山谷', emoji: '⛰️', color: '#6cc6ff', desc: '动词·语法·拼写·生活对话',
+      levels: [['动作单词','en_g5_verb',10,'🏃'],['语法入门','en_g5_grammar',10,'📘'],['地点场所','en_g5_place',10,'🏫'],['拼写强化','en_g6_spell',8,'✍️'],['生活对话','en_life_high',8,'🏥']] },
     { grade: '六年级', name: '综合王国', emoji: '👑', color: '#ff7eb6', desc: '语法·拼写·综合对话',
-      levels: [['语法综合','en_g6_grammar',10,'📚'],['拼写高手','en_g6_spell',10,'🏆'],['自然万物','en_g6_nature',10,'🌍'],['综合对话','en_g6_dialog',8,'💭']] }
+      levels: [['语法综合','en_g6_grammar',10,'📚'],['拼写高手','en_g6_spell',10,'🏆'],['自然万物','en_g6_nature',10,'🌍'],['综合对话','en_g6_dialog',8,'💭'],['生活对话','en_life_high',8,'🛍️']] }
   ]);
 
   var EN_STAR = { three: 1.0, two: 0.8, one: 0.6 };
