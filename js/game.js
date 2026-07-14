@@ -23,8 +23,14 @@
     stopTimer();
     session = null;
     const cards = Subjects.all().map(sub => {
-      const ts = Store.totalStars(sub.id);
-      const ms = Store.maxStars(sub.id);
+      let ts, ms;
+      if (sub.virtual) {
+        ts = Subjects.englishSubs().reduce((a, s) => a + Store.totalStars(s.id), 0);
+        ms = Subjects.englishSubs().reduce((a, s) => a + Store.maxStars(s.id), 0);
+      } else {
+        ts = Store.totalStars(sub.id);
+        ms = Store.maxStars(sub.id);
+      }
       return '<button class="subject-card" data-sub="' + sub.id + '" style="--sc:' + sub.color + '">' +
         '<div class="subject-emoji">' + sub.emoji + '</div>' +
         '<div class="subject-name">' + sub.name + '</div>' +
@@ -47,10 +53,53 @@
       btn.addEventListener('click', () => {
         Sound.unlock();
         Sound.SFX.click();
+        const id = btn.dataset.sub;
+        if (Subjects.get(id).virtual) { renderEnglishPick(); return; }
+        curSubject = id;
+        renderMap();
+      });
+    });
+  }
+
+  // ================= 英语教材选择页（译林 / 新思维） =================
+  function renderEnglishPick() {
+    stopTimer();
+    session = null;
+    const cards = Subjects.englishSubs().map(sub => {
+      const ts = Store.totalStars(sub.id);
+      const ms = Store.maxStars(sub.id);
+      return '<button class="subject-card" data-sub="' + sub.id + '" style="--sc:' + sub.color + '">' +
+        '<div class="subject-emoji">' + sub.emoji + '</div>' +
+        '<div class="subject-name">' + sub.name + '</div>' +
+        '<div class="subject-tag">' + sub.tagline + '</div>' +
+        '<div class="subject-stars">⭐ ' + ts + ' / ' + ms + '</div>' +
+      '</button>';
+    }).join('');
+
+    show(
+      '<header class="topbar">' +
+        '<button class="icon-btn" id="btnHome" title="返回">⬅️</button>' +
+        '<div class="brand">🔤 英语大冒险</div>' +
+        '<div class="topbar-right"></div>' +
+      '</header>' +
+      '<div class="home">' +
+        '<div class="home-hero">' +
+          '<div class="home-title">选择你的英语教材</div>' +
+          '<div class="home-sub">译林版和新思维进度各自独立哦～</div>' +
+        '</div>' +
+        '<div class="subject-grid">' + cards + '</div>' +
+        '<footer class="tip">💡 用哪套教材就选哪个，两套都能玩～</footer>' +
+      '</div>'
+    );
+    $$('.subject-card').forEach(btn => {
+      btn.addEventListener('click', () => {
+        Sound.unlock();
+        Sound.SFX.click();
         curSubject = btn.dataset.sub;
         renderMap();
       });
     });
+    $('#btnHome').addEventListener('click', () => { Sound.SFX.click(); renderHome(); });
   }
 
   // ================= 关卡地图（按当前科目） =================
@@ -112,7 +161,11 @@
         renderLevelIntro(btn.dataset.level);
       });
     });
-    $('#btnHome').addEventListener('click', () => { Sound.SFX.click(); renderHome(); });
+    $('#btnHome').addEventListener('click', () => {
+      Sound.SFX.click();
+      if (Subjects.get(curSubject).parent === 'english') renderEnglishPick();
+      else renderHome();
+    });
     $('#btnBadges').addEventListener('click', () => { Sound.SFX.click(); renderBadges(); });
     $('#btnSound').addEventListener('click', toggleSound);
     $('#btnMenu').addEventListener('click', () => { Sound.SFX.click(); renderMenu(); });

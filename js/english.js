@@ -330,8 +330,40 @@
     return { inputMode: 'choice', text: g.text, answer: g.a, options: opts, hint: '选出正确的词', long: true };
   }
 
+  // 自然拼读（新思维特色）：听发音，选首字母/结尾不发音字母
+  const PHONICS = [
+    { word: 'cat', zh: '猫', ask: '首字母', a: 'c', opts: ['c', 'k', 's', 'g'] },
+    { word: 'dog', zh: '狗', ask: '首字母', a: 'd', opts: ['d', 't', 'b', 'p'] },
+    { word: 'sun', zh: '太阳', ask: '首字母', a: 's', opts: ['s', 'z', 'c', 'x'] },
+    { word: 'fish', zh: '鱼', ask: '首字母', a: 'f', opts: ['f', 'v', 'p', 't'] },
+    { word: 'ball', zh: '球', ask: '首字母', a: 'b', opts: ['b', 'p', 'd', 'v'] },
+    { word: 'map', zh: '地图', ask: '首字母', a: 'm', opts: ['m', 'n', 'b', 'w'] },
+    { word: 'red', zh: '红', ask: '首字母', a: 'r', opts: ['r', 'l', 'w', 'n'] },
+    { word: 'hat', zh: '帽子', ask: '首字母', a: 'h', opts: ['h', 'a', 'e', 'j'] },
+    { word: 'pen', zh: '钢笔', ask: '首字母', a: 'p', opts: ['p', 'b', 'd', 'q'] },
+    { word: 'net', zh: '网', ask: '首字母', a: 'n', opts: ['n', 'm', 'l', 'r'] },
+    { word: 'six', zh: '六', ask: '首字母', a: 's', opts: ['s', 'z', 'x', 'c'] },
+    { word: 'cake', zh: '蛋糕', ask: '结尾不发音字母', a: 'e', opts: ['e', 'a', 'k', 'c'] },
+    { word: 'bike', zh: '自行车', ask: '结尾不发音字母', a: 'e', opts: ['e', 'i', 'k', 'b'] },
+    { word: 'nose', zh: '鼻子', ask: '结尾不发音字母', a: 'e', opts: ['e', 'o', 's', 'n'] }
+  ];
+  function phonics() {
+    const p = pick(PHONICS);
+    const opts = shuffle(p.opts.slice(0, 4));
+    return {
+      inputMode: 'choice',
+      text: '<span class="en-word">' + p.word + '</span><span class="en-zh">（' + p.zh + '）</span>',
+      speak: p.word,
+      answer: p.a,
+      options: opts,
+      hint: '听发音，选「' + p.ask + '」',
+      long: true
+    };
+  }
+
   // ============ 题型分发（levels 里的 type 映射到这里）============
   const GEN = {
+    en_phonics: () => phonics(),
     // 一年级：颜色/数字/动物/水果，图→英 & 英→中
     en_g1_color: () => pick([wordPicToEn(['color']), wordZhToEn(['color'])]),
     en_g1_animal: () => pick([wordPicToEn(['animal']), wordEnToZh(['animal'])]),
