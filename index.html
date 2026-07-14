@@ -30,21 +30,35 @@
     window.addEventListener('DOMContentLoaded', function () {
       window.Game.init();
     });
-    // 注册 Service Worker（仅在 http/https 下生效，本地 file:// 会静默跳过）
-    if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
-      // 新 SW 接管后自动刷新一次，确保用户拿到最新代码（跳出旧缓存）
-      var refreshed = false;
-      navigator.serviceWorker.addEventListener('controllerchange', function () {
-        if (refreshed) return;
-        refreshed = true;
-        window.location.reload();
-      });
-      window.addEventListener('load', function () {
-        navigator.serviceWorker.register('sw.js').then(function (reg) {
-          reg.update();
-        }).catch(function () {});
-      });
-    }
+    // ==== 一次性自愈：清掉旧版 Service Worker + 缓存，跳出卡死的旧代码 ====
+    // 旧版用“缓存优先”会把老代码钉死在手机上，这里强制注销+清缓存+刷新一次。
+    (function () {
+      if (location.protocol.indexOf('http') !== 0) return;
+      var HEAL_KEY = 'sw_heal_v3';
+      try {
+        if ('serviceWorker' in navigator && !localStorage.getItem(HEAL_KEY)) {
+          localStorage.setItem(HEAL_KEY, '1');
+          var jobs = [];
+          jobs.push(navigator.serviceWorker.getRegistrations().then(function (rs) {
+            return Promise.all(rs.map(function (r) { return r.unregister(); }));
+          }).catch(function () {}));
+          if (window.caches && caches.keys) {
+            jobs.push(caches.keys().then(function (ks) {
+              return Promise.all(ks.map(function (k) { return caches.delete(k); }));
+            }).catch(function () {}));
+          }
+          Promise.all(jobs).then(function () { location.reload(true); });
+          return; // 本次不再注册，等刷新后干净地重来
+        }
+      } catch (e) { /* localStorage 不可用则忽略 */ }
+
+      // 正常注册（自愈完成后）
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('sw.js').then(function (reg) { reg.update(); }).catch(function () {});
+        });
+      }
+    })();
   </script>
 </body>
 </html>
