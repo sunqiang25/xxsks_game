@@ -62,11 +62,26 @@
   function unlock() {
     const c = ac();
     if (c && c.state === 'suspended') c.resume();
+    primeSpeech();
   }
 
   // ---------- 英文朗读：Web Speech API ----------
   let enVoice = null;
   let voicesReady = false;
+  let speechPrimed = false;
+  // 手机上语音合成需在用户手势里"预热"一次，否则后续 speak 被静默拦截
+  function primeSpeech() {
+    if (speechPrimed || !supportsSpeech()) return;
+    try {
+      const synth = global.speechSynthesis;
+      if (synth.paused) synth.resume();
+      const u = new global.SpeechSynthesisUtterance(' ');
+      u.volume = 0; // 静音预热，不打扰
+      u.lang = 'en-US';
+      synth.speak(u);
+      speechPrimed = true;
+    } catch (e) { /* 忽略 */ }
+  }
   function pickVoice() {
     const synth = global.speechSynthesis;
     if (!synth) return;
@@ -93,6 +108,7 @@
     try {
       const synth = global.speechSynthesis;
       synth.cancel(); // 打断上一段，避免堆积
+      if (synth.paused) synth.resume();
       if (!voicesReady) pickVoice();
       const u = new global.SpeechSynthesisUtterance(String(text));
       u.lang = (enVoice && enVoice.lang) || 'en-US';

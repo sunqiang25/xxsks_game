@@ -303,9 +303,10 @@
         '</div>';
     }
 
-    // 题干区：英语题带发音按钮（若该题有 speak 内容）
-    const canSpeak = isEnglish() && q.speak && Sound.supportsSpeech();
-    const speakBtn = canSpeak
+    // 题干区：英语题带发音按钮（有 speak 内容就显示，点了再判断能否发音）
+    const hasSpeakText = isEnglish() && !!q.speak;
+    const canSpeak = hasSpeakText && Sound.supportsSpeech();
+    const speakBtn = hasSpeakText
       ? '<button class="speak-btn" id="btnSpeak" title="听发音">🔊</button>'
       : '';
     const qClass = isEnglish() ? 'question en pop' : 'question pop';
@@ -335,12 +336,18 @@
       else if (!s.locked) startTimer();
     });
 
-    if (canSpeak) {
+    if (hasSpeakText) {
       const sb = $('#btnSpeak');
-      if (sb) sb.addEventListener('click', (e) => { e.stopPropagation(); Sound.speak(q.speak); });
-      // 进入题目自动读一次（词汇/拼写题）
-      if (q.inputMode !== 'choice' || q.speak) {
-        setTimeout(() => Sound.speak(q.speak), 350);
+      if (sb) sb.addEventListener('click', (e) => {
+        e.stopPropagation();
+        Sound.unlock();
+        if (!Sound.supportsSpeech()) { toast('😥 当前浏览器不支持朗读，请用 Safari/Chrome 打开'); return; }
+        const ok = Sound.speak(q.speak);
+        if (!ok) toast('🔇 请先打开右上角音效，或用系统浏览器打开');
+      });
+      // 进入题目自动读一次（手机可能拦截，点 🔊 一定能读）
+      if (canSpeak) {
+        setTimeout(() => Sound.speak(q.speak), 400);
       }
     }
 
@@ -829,6 +836,15 @@
     Sound.SFX.badge();
     setTimeout(() => t.classList.add('out'), 1600);
     setTimeout(() => t.remove(), 2200);
+  }
+  // 通用提示 toast（如发音不可用时的说明）
+  function toast(msg) {
+    const t = document.createElement('div');
+    t.className = 'badge-toast pop';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.classList.add('out'), 2200);
+    setTimeout(() => t.remove(), 2800);
   }
 
   // ================= 启动 =================
