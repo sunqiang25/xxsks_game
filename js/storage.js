@@ -21,8 +21,21 @@
     return {
       subjects: { math: emptySubject(), english: emptySubject() },
       badges: [],
+      coins: 0,
+      wishes: defaultWishes(),
+      redeemed: [],
       settings: { sound: true, theme: 'space', difficulty: 'std' }
     };
+  }
+
+  // 预置愿望清单（家长可改）
+  function defaultWishes() {
+    return [
+      { id: 'w_tv', name: '看电视 30 分钟', emoji: '📺', cost: 80 },
+      { id: 'w_phone', name: '玩手机 15 分钟', emoji: '📱', cost: 60 },
+      { id: 'w_ice', name: '买一个冰淇淋', emoji: '🍦', cost: 50 },
+      { id: 'w_park', name: '周末去公园', emoji: '🏞️', cost: 200 }
+    ];
   }
 
   // 旧版(v1,纯数学)存档迁移：{levels,badges,stats,settings} -> subjects.math
@@ -50,6 +63,9 @@
       const base = defaultState();
       base.settings = Object.assign(base.settings, data.settings || {});
       base.badges = Array.isArray(data.badges) ? data.badges : [];
+      base.coins = typeof data.coins === 'number' ? data.coins : 0;
+      base.wishes = (Array.isArray(data.wishes) && data.wishes.length) ? data.wishes : defaultWishes();
+      base.redeemed = Array.isArray(data.redeemed) ? data.redeemed : [];
       ['math', 'english'].forEach(sid => {
         const s = (data.subjects && data.subjects[sid]) || {};
         base.subjects[sid] = {
@@ -111,6 +127,15 @@
     const improved = stars > prev.stars || score > prev.best;
     sub(subjectId).levels[levelId] = rec;
 
+    // ---- 金币奖励：首次达到某星级给大额，重玩只给安慰奖 ----
+    const COIN_BY_STAR = { 1: 10, 2: 20, 3: 40 };
+    let coinsEarned = 0;
+    if (stars >= 1) {
+      const firstReach = prev.plays === 0 || stars > prev.stars; // 首次通关或星级提升
+      coinsEarned = firstReach ? (COIN_BY_STAR[stars] || 0) : 2;  // 重玩安慰奖 2
+      state.coins = (state.coins || 0) + coinsEarned;
+    }
+
     const st = sub(subjectId).stats;
     st.totalCorrect += correct;
     st.totalWrong += (total - correct);
@@ -120,7 +145,7 @@
 
     const newBadges = checkBadges(subjectId);
     save();
-    return { newStars: stars, storedStars: rec.stars, improved: improved, newBadges: newBadges, fast: rec.fast };
+    return { newStars: stars, storedStars: rec.stars, improved: improved, newBadges: newBadges, fast: rec.fast, coinsEarned: coinsEarned };
   }
 
   // ---------- 星数统计（按科目） ----------
@@ -200,6 +225,27 @@
     save();
   }
 
+  // ---------- 金币 & 愿望清单 ----------
+  function getCoins() { return state.coins || 0; }
+  function spendCoins(n) {
+    n = Math.max(0, Math.floor(n || 0));
+    if ((state.coins || 0) < n) return false;
+    state.coins -= n;
+    save();
+    return true;
+  }
+  function getWishes() { return Array.isArray(state.wishes) ? state.wishes : []; }
+  function setWishes(arr) {
+    if (Array.isArray(arr)) { state.wishes = arr; save(); }
+  }
+  function getRedeemed() { return Array.isArray(state.redeemed) ? state.redeemed : []; }
+  function pushRedeemed(entry) {
+    if (!Array.isArray(state.redeemed)) state.redeemed = [];
+    state.redeemed.unshift(entry); // 最新的在前
+    if (state.redeemed.length > 50) state.redeemed.length = 50; // 只留最近 50 条
+    save();
+  }
+
   // 清空：可指定科目，不传则全清
   function reset(subjectId) {
     if (subjectId) {
@@ -226,6 +272,12 @@
     worldCleared: worldCleared,
     totalCorrectOf: totalCorrectOf,
     setSetting: setSetting,
+    getCoins: getCoins,
+    spendCoins: spendCoins,
+    getWishes: getWishes,
+    setWishes: setWishes,
+    getRedeemed: getRedeemed,
+    pushRedeemed: pushRedeemed,
     reset: reset
   };
 })(window);

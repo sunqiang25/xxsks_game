@@ -44,11 +44,14 @@
         '<div class="home-hero">' +
           '<div class="home-title">🌌 学习大冒险</div>' +
           '<div class="home-sub">选择今天想闯关的科目吧！</div>' +
+          '<button class="coin-balance" id="homeShop">🪙 ' + Store.getCoins() + ' 金币 · 去奖励商店 🎁</button>' +
         '</div>' +
         '<div class="subject-grid">' + cards + '</div>' +
         '<footer class="tip">💡 数学和英语进度各自独立，随时切换～</footer>' +
       '</div>'
     );
+    const shopBtn = $('#homeShop');
+    if (shopBtn) shopBtn.addEventListener('click', () => { Sound.unlock(); Sound.SFX.click(); renderRewardShop(); });
     $$('.subject-card').forEach(btn => {
       btn.addEventListener('click', () => {
         Sound.unlock();
@@ -649,6 +652,10 @@
         '</details>'
       : '<div class="all-correct">🎉 全部答对，太厉害啦！</div>';
 
+    const coinHtml = result.coinsEarned
+      ? '<div class="coin-earned pop">🪙 +' + result.coinsEarned + ' 金币！<span class="coin-total">（共 ' + Store.getCoins() + '）</span></div>'
+      : '';
+
     show(
       '<div class="screen center">' +
         '<div class="result-card pop">' +
@@ -663,6 +670,7 @@
           '</div>' +
           (s.timedOut > 0 ? '<div class="timeout-note">⏰ 有 ' + s.timedOut + ' 题超时了，下次手要快一点哦！</div>' : '') +
           (result.fast && stars >= 2 ? '<div class="fast-medal pop">⚡ 速度奖章：手速飞快！</div>' : '') +
+          coinHtml +
           badgeHtml +
           wrongReview +
           '<div class="intro-btns">' +
@@ -676,6 +684,7 @@
 
     if (stars >= 1) burstConfetti();
     animateResultStars(stars);
+    if (result.coinsEarned) setTimeout(() => Sound.SFX.star(), 900);
 
     if (canNext) $('#btnNext').addEventListener('click', () => { Sound.SFX.click(); renderLevelIntro(nextLevel.id); });
     $('#btnRetry').addEventListener('click', () => { Sound.SFX.click(); startLevel(s.level); });
@@ -738,6 +747,150 @@
     $('#btnBack').addEventListener('click', () => { Sound.SFX.click(); renderMap(); });
   }
 
+  // ================= 家长验证锁 =================
+  function parentGate(onPass) {
+    const a = 6 + Math.floor((s_seed() % 4)); // 6-9
+    const b = 6 + Math.floor((s_seed() % 4));
+    const ans = window.prompt('👨‍👩‍👧 家长验证\n请算出 ' + a + ' × ' + b + ' = ?');
+    if (ans === null) return; // 取消
+    if (parseInt(ans, 10) === a * b) { onPass(); }
+    else { toast('❌ 答案不对，需要家长来操作哦'); }
+  }
+  // 简单伪随机（避免 Math.random 的一致性问题，这里用时间片充分够用）
+  let _seedN = 0;
+  function s_seed() { _seedN = (_seedN + 7) % 97; return (performance.now() | 0) + _seedN; }
+
+  // ================= 奖励商店 =================
+  function renderRewardShop() {
+    const coins = Store.getCoins();
+    const wishes = Store.getWishes();
+    const cards = wishes.map(w => {
+      const afford = coins >= w.cost;
+      return '<div class="wish-card' + (afford ? ' affordable' : ' locked') + '">' +
+        '<div class="wish-emoji">' + w.emoji + '</div>' +
+        '<div class="wish-name">' + esc(w.name) + '</div>' +
+        '<div class="wish-cost">🪙 ' + w.cost + '</div>' +
+        '<button class="btn primary wish-buy" data-id="' + w.id + '"' + (afford ? '' : ' disabled') + '>' +
+          (afford ? '兑换' : '金币不够') + '</button>' +
+      '</div>';
+    }).join('');
+
+    show(
+      '<header class="topbar">' +
+        '<button class="icon-btn" id="btnBack">⬅️</button>' +
+        '<div class="brand">🎁 奖励商店</div>' +
+        '<div class="topbar-right"><span class="coin-count">🪙 ' + coins + '</span></div>' +
+      '</header>' +
+      '<div class="shop-tip">💪 闯关赚金币，换取心愿奖励！攒够就找爸爸妈妈兑现～</div>' +
+      '<div class="badge-wall">' + (cards || '<div class="stat-summary">还没有奖励，去家长管理里添加吧～</div>') + '</div>' +
+      '<div class="shop-actions">' +
+        '<button class="btn" id="btnRedeemed">📜 已兑换记录</button>' +
+        '<button class="btn ghost" id="btnParent">👨‍👩‍👧 家长管理</button>' +
+      '</div>'
+    );
+    $('#btnBack').addEventListener('click', () => { Sound.SFX.click(); renderMap(); });
+    $('#btnRedeemed').addEventListener('click', () => { Sound.SFX.click(); renderRedeemed(); });
+    $('#btnParent').addEventListener('click', () => { Sound.SFX.click(); parentGate(renderWishEdit); });
+    $$('.wish-buy').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        const w = Store.getWishes().find(x => x.id === id);
+        if (!w) return;
+        Sound.SFX.click();
+        if (!confirm('确定用 ' + w.cost + ' 金币兑换「' + w.name + '」吗？')) return;
+        parentGate(() => {
+          if (Store.spendCoins(w.cost)) {
+            Store.pushRedeemed({ wishId: w.id, name: w.name, emoji: w.emoji });
+            Sound.SFX.win();
+            toast('🎉 兑换成功！请找爸爸妈妈兑现「' + w.name + '」');
+            renderRewardShop();
+          } else {
+            toast('金币不够啦，再去闯几关吧！');
+          }
+        });
+      });
+    });
+  }
+
+  // 已兑换记录
+  function renderRedeemed() {
+    const list = Store.getRedeemed();
+    const rows = list.length
+      ? list.map(r => '<div class="redeem-row">' + r.emoji + ' ' + esc(r.name) + '</div>').join('')
+      : '<div class="stat-summary">还没有兑换记录，加油攒金币～</div>';
+    show(
+      '<header class="topbar">' +
+        '<button class="icon-btn" id="btnBack">⬅️</button>' +
+        '<div class="brand">📜 已兑换记录</div>' +
+        '<div class="topbar-right"><span class="coin-count">🪙 ' + Store.getCoins() + '</span></div>' +
+      '</header>' +
+      '<div class="redeem-list">' + rows + '</div>' +
+      '<div class="shop-tip">💡 兑换后请家长实际兑现奖励哦～</div>'
+    );
+    $('#btnBack').addEventListener('click', () => { Sound.SFX.click(); renderRewardShop(); });
+  }
+
+  // 家长管理：编辑愿望清单
+  function renderWishEdit() {
+    const wishes = Store.getWishes();
+    const rows = wishes.map(w =>
+      '<div class="wish-edit-row">' +
+        '<span class="wish-edit-emoji">' + w.emoji + '</span>' +
+        '<span class="wish-edit-name">' + esc(w.name) + '</span>' +
+        '<span class="wish-edit-cost">🪙' + w.cost + '</span>' +
+        '<button class="mini-btn" data-act="rename" data-id="' + w.id + '">改名</button>' +
+        '<button class="mini-btn" data-act="price" data-id="' + w.id + '">改价</button>' +
+        '<button class="mini-btn danger" data-act="del" data-id="' + w.id + '">删</button>' +
+      '</div>'
+    ).join('');
+    show(
+      '<header class="topbar">' +
+        '<button class="icon-btn" id="btnBack">⬅️</button>' +
+        '<div class="brand">👨‍👩‍👧 家长管理</div>' +
+        '<div class="topbar-right"></div>' +
+      '</header>' +
+      '<div class="shop-tip">在这里设置奖励和所需金币，孩子攒够就能兑换。</div>' +
+      '<div class="wish-edit-list">' + rows + '</div>' +
+      '<div class="shop-actions">' +
+        '<button class="btn primary" id="btnAdd">➕ 添加奖励</button>' +
+        '<button class="btn ghost" id="btnBack2">返回商店</button>' +
+      '</div>'
+    );
+    const back = () => { Sound.SFX.click(); renderRewardShop(); };
+    $('#btnBack').addEventListener('click', back);
+    $('#btnBack2').addEventListener('click', back);
+    $('#btnAdd').addEventListener('click', () => {
+      const name = (window.prompt('奖励名称（如：看电视30分钟）') || '').trim();
+      if (!name) return;
+      const emoji = (window.prompt('给它一个emoji图标（如 📺，可留空）') || '🎁').trim() || '🎁';
+      const cost = parseInt(window.prompt('需要多少金币兑换？（数字）', '50'), 10);
+      if (!cost || cost <= 0) { toast('价格要填正整数哦'); return; }
+      const arr = Store.getWishes().slice();
+      arr.push({ id: 'w_' + (performance.now() | 0) + '_' + arr.length, name: name, emoji: emoji, cost: cost });
+      Store.setWishes(arr);
+      Sound.SFX.click();
+      renderWishEdit();
+    });
+    $$('.mini-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id, act = btn.dataset.act;
+        const arr = Store.getWishes().slice();
+        const i = arr.findIndex(x => x.id === id);
+        if (i < 0) return;
+        if (act === 'rename') {
+          const nn = (window.prompt('新名称', arr[i].name) || '').trim();
+          if (nn) { arr[i] = Object.assign({}, arr[i], { name: nn }); Store.setWishes(arr); renderWishEdit(); }
+        } else if (act === 'price') {
+          const np = parseInt(window.prompt('新价格（金币数）', String(arr[i].cost)), 10);
+          if (np && np > 0) { arr[i] = Object.assign({}, arr[i], { cost: np }); Store.setWishes(arr); renderWishEdit(); }
+        } else if (act === 'del') {
+          if (confirm('删除奖励「' + arr[i].name + '」？')) { arr.splice(i, 1); Store.setWishes(arr); renderWishEdit(); }
+        }
+      });
+    });
+  }
+
+
   // ================= 设置菜单 =================
   function renderMenu() {
     show(
@@ -745,6 +898,7 @@
         '<div class="intro-card pop">' +
           '<h1>⚙️ 设置</h1>' +
           '<div class="menu-list">' +
+            '<button class="btn primary" id="mShop">🎁 奖励商店（' + Store.getCoins() + ' 🪙）</button>' +
             '<button class="btn" id="mSound">' + (Store.get().settings.sound ? '🔊 音效：开' : '🔇 音效：关') + '</button>' +
             '<button class="btn" id="mBadges">🏅 查看徽章墙</button>' +
             '<button class="btn" id="mResetSub">🧹 清空本科目进度</button>' +
@@ -755,6 +909,7 @@
         '</div>' +
       '</div>'
     );
+    $('#mShop').addEventListener('click', () => { Sound.SFX.click(); renderRewardShop(); });
     $('#mSound').addEventListener('click', () => {
       toggleSoundSilent();
       $('#mSound').textContent = Store.get().settings.sound ? '🔊 音效：开' : '🔇 音效：关';

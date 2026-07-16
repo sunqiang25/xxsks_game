@@ -1,6 +1,6 @@
 // Service Worker：网络优先 + 缓存兜底（保证用户总能拿到最新代码，断网时才用缓存）
 // 改动文件后把 CACHE 版本号 +1
-const CACHE = 'mathquest-v3';
+const CACHE = 'mathquest-v4';
 const ASSETS = [
   './',
   './index.html',
