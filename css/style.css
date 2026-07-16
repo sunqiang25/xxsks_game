@@ -636,3 +636,20 @@ body::before {
   padding: 14px 16px; margin-bottom: 12px; font-size: 15px; line-height: 1.7;
 }
 .help-step b { color: var(--accent); font-size: 16px; }
+
+/* 首次进入欢迎引导 */
+.welcome-mask {
+  position: fixed; inset: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  background: rgba(6, 9, 24, 0.82); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+}
+.welcome-card {
+  background: var(--card); border: 1px solid var(--card-border); border-radius: 26px;
+  padding: 30px 24px; max-width: 400px; width: 100%; text-align: center;
+  box-shadow: 0 24px 70px rgba(0,0,0,0.55);
+}
+.welcome-emoji { font-size: 64px; margin-bottom: 6px; }
+.welcome-card h1 { font-size: 24px; margin-bottom: 12px; }
+.welcome-card p { color: var(--text); font-size: 15px; line-height: 1.7; margin-bottom: 8px; }
+.welcome-card .welcome-sub { color: var(--muted); font-size: 14px; }
+.welcome-btns { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }

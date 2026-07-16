@@ -941,7 +941,7 @@
       '<div class="help-body">' + t.html + '</div>' +
       '<div class="shop-tip">🌐 分享给别人：把网址复制到 Safari/Chrome/夸克打开（微信里打不开哦）</div>'
     );
-    $('#btnBack').addEventListener('click', () => { Sound.SFX.click(); renderMap(); });
+    $('#btnBack').addEventListener('click', () => { Sound.SFX.click(); renderHome(); });
     $$('.help-tab').forEach(btn => {
       btn.addEventListener('click', () => { Sound.SFX.click(); renderHelp(btn.dataset.tab); });
     });
@@ -1060,9 +1060,33 @@
     setTimeout(() => t.remove(), 2800);
   }
 
+  // ================= 首次进入引导 =================
+  function maybeShowWelcome() {
+    if (Store.get().settings.seenTutorial) return;
+    Store.setSetting('seenTutorial', true);
+    const ov = document.createElement('div');
+    ov.className = 'welcome-mask';
+    ov.innerHTML =
+      '<div class="welcome-card pop">' +
+        '<div class="welcome-emoji">🚀</div>' +
+        '<h1>欢迎来到学习大冒险！</h1>' +
+        '<p>数学口算 + 英语闯关，答对赚金币🪙，还能换取爸爸妈妈准备的奖励！</p>' +
+        '<p class="welcome-sub">第一次玩？先花 1 分钟看看怎么玩吧～</p>' +
+        '<div class="welcome-btns">' +
+          '<button class="btn primary big" id="wcHelp">📖 查看教程</button>' +
+          '<button class="btn ghost" id="wcSkip">直接开始玩 ➡️</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(ov);
+    const close = () => { ov.remove(); };
+    $('#wcHelp').addEventListener('click', () => { Sound.unlock(); Sound.SFX.click(); close(); renderHelp(); });
+    $('#wcSkip').addEventListener('click', () => { Sound.unlock(); Sound.SFX.click(); close(); });
+  }
+
   // ================= 启动 =================
   function init() {
     renderHome();
+    maybeShowWelcome();
     document.body.addEventListener('pointerdown', () => Sound.unlock(), { once: true });
   }
 
