@@ -47,11 +47,13 @@
           '<button class="coin-balance" id="homeShop">🪙 ' + Store.getCoins() + ' 金币 · 去奖励商店 🎁</button>' +
         '</div>' +
         '<div class="subject-grid">' + cards + '</div>' +
-        '<footer class="tip">💡 数学和英语进度各自独立，随时切换～</footer>' +
+        '<footer class="tip">💡 数学和英语进度各自独立，随时切换～<br><button class="help-link" id="homeHelp">❓ 新手教程 & 攻略</button></footer>' +
       '</div>'
     );
     const shopBtn = $('#homeShop');
     if (shopBtn) shopBtn.addEventListener('click', () => { Sound.unlock(); Sound.SFX.click(); renderRewardShop(); });
+    const helpBtn = $('#homeHelp');
+    if (helpBtn) helpBtn.addEventListener('click', () => { Sound.unlock(); Sound.SFX.click(); renderHelp(); });
     $$('.subject-card').forEach(btn => {
       btn.addEventListener('click', () => {
         Sound.unlock();
@@ -891,6 +893,60 @@
   }
 
 
+  // ================= 玩法教程 & 攻略 =================
+  const HELP_TABS = {
+    kid: {
+      title: '🧒 怎么玩',
+      html:
+        '<div class="help-step"><b>1. 选科目</b><br>首页点「🚀 口算大冒险」或「🔤 英语大冒险」。英语还要再选译林版或新思维。</div>' +
+        '<div class="help-step"><b>2. 选关卡</b><br>每个年级第一关直接能玩。星图里点亮的关卡就能进，🔒 锁住的要先通过前一关。</div>' +
+        '<div class="help-step"><b>3. 选难度</b><br>开始前选 🐢轻松 / ⭐标准 / 🔥挑战。越难时间越短、金币一样，先从标准开始。</div>' +
+        '<div class="help-step"><b>4. 答题</b><br>数学用数字键盘输入答案点「确定」；选择题直接点选项。英语点题目旁的 🔊 能听发音。</div>' +
+        '<div class="help-step"><b>5. 看结果</b><br>答对越多星星越多：全对 3⭐、八成 2⭐、过关 1⭐。还能拿金币 🪙！</div>' +
+        '<div class="help-step"><b>6. 换奖励</b><br>金币攒够了，去「🎁 奖励商店」换爸爸妈妈准备的奖励（要爸妈帮忙确认哦）。</div>'
+    },
+    parent: {
+      title: '👨‍👩‍👧 家长说明',
+      html:
+        '<div class="help-step"><b>🪙 金币规则</b><br>孩子每关按星级得金币：首次通关 1⭐=10、2⭐=20、3⭐=40 金币；从低星刷到高星会补差价；重玩已通关的关卡只给 2 金币（防刷）。</div>' +
+        '<div class="help-step"><b>🎁 设置奖励</b><br>奖励商店 →「👨‍👩‍👧 家长管理」，可以改奖励名称、价格（金币数）、增删。预置了看电视/玩手机/冰淇淋/去公园。</div>' +
+        '<div class="help-step"><b>🔒 家长锁</b><br>改奖励清单、确认兑换时会弹一道乘法题（如 7×8），答对才放行，防止孩子自己乱改或白领奖励。</div>' +
+        '<div class="help-step"><b>📊 看弱项</b><br>「🏅 徽章墙」底部会显示孩子错得最多的题型，可以针对性多练那一关。</div>' +
+        '<div class="help-step"><b>💾 进度保存</b><br>进度存在这个浏览器本地。换浏览器/清缓存会清空。别在微信里打开（微信屏蔽），用 Safari/Chrome/夸克。</div>'
+    },
+    tips: {
+      title: '🏆 高分攻略',
+      html:
+        '<div class="help-step"><b>⭐ 怎么拿 3 星</b><br>3 星要求全部答对。想满分就选 🐢轻松 挡，时间充足、看清楚再答。</div>' +
+        '<div class="help-step"><b>🔥 连击加分</b><br>连续答对会触发连击，越连越多分，还有「十连击」徽章。别急着抢答，稳住连对更划算。</div>' +
+        '<div class="help-step"><b>💰 最快攒金币</b><br>金币看首次通关的星级。优先去还没通关的新关卡拿首通大奖（3⭐=40），比重玩老关卡（只有2）快得多。</div>' +
+        '<div class="help-step"><b>⚡ 速度奖章</b><br>标准/挑战挡下又快又准（2⭐以上且平均每题够快）能拿速度奖章。</div>' +
+        '<div class="help-step"><b>📖 应用题/图形题</b><br>题干会有多行，别被吓到。先读中文，圈出数字，想清楚是加还是减再动手。这类题时间给得更长。</div>' +
+        '<div class="help-step"><b>🔤 英语听发音</b><br>不认识的单词先点 🔊 听一遍再选。答完还会再读一次正确答案，跟着念记得牢。</div>'
+    }
+  };
+  function renderHelp(tab) {
+    tab = tab || 'kid';
+    const t = HELP_TABS[tab] || HELP_TABS.kid;
+    const tabBtns = Object.keys(HELP_TABS).map(k =>
+      '<button class="help-tab' + (k === tab ? ' active' : '') + '" data-tab="' + k + '">' + HELP_TABS[k].title + '</button>'
+    ).join('');
+    show(
+      '<header class="topbar">' +
+        '<button class="icon-btn" id="btnBack">⬅️</button>' +
+        '<div class="brand">❓ 教程 & 攻略</div>' +
+        '<div class="topbar-right"></div>' +
+      '</header>' +
+      '<div class="help-tabs">' + tabBtns + '</div>' +
+      '<div class="help-body">' + t.html + '</div>' +
+      '<div class="shop-tip">🌐 分享给别人：把网址复制到 Safari/Chrome/夸克打开（微信里打不开哦）</div>'
+    );
+    $('#btnBack').addEventListener('click', () => { Sound.SFX.click(); renderMap(); });
+    $$('.help-tab').forEach(btn => {
+      btn.addEventListener('click', () => { Sound.SFX.click(); renderHelp(btn.dataset.tab); });
+    });
+  }
+
   // ================= 设置菜单 =================
   function renderMenu() {
     show(
@@ -899,6 +955,7 @@
           '<h1>⚙️ 设置</h1>' +
           '<div class="menu-list">' +
             '<button class="btn primary" id="mShop">🎁 奖励商店（' + Store.getCoins() + ' 🪙）</button>' +
+            '<button class="btn" id="mHelp">❓ 玩法教程 & 攻略</button>' +
             '<button class="btn" id="mSound">' + (Store.get().settings.sound ? '🔊 音效：开' : '🔇 音效：关') + '</button>' +
             '<button class="btn" id="mBadges">🏅 查看徽章墙</button>' +
             '<button class="btn" id="mResetSub">🧹 清空本科目进度</button>' +
@@ -910,6 +967,7 @@
       '</div>'
     );
     $('#mShop').addEventListener('click', () => { Sound.SFX.click(); renderRewardShop(); });
+    $('#mHelp').addEventListener('click', () => { Sound.SFX.click(); renderHelp(); });
     $('#mSound').addEventListener('click', () => {
       toggleSoundSilent();
       $('#mSound').textContent = Store.get().settings.sound ? '🔊 音效：开' : '🔇 音效：关';
