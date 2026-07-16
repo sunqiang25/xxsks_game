@@ -44,14 +44,21 @@
       { en: 'bird', zh: '鸟', emoji: '🐦' }, { en: 'fish', zh: '鱼', emoji: '🐟' },
       { en: 'rabbit', zh: '兔子', emoji: '🐰' }, { en: 'tiger', zh: '老虎', emoji: '🐯' },
       { en: 'panda', zh: '熊猫', emoji: '🐼' }, { en: 'monkey', zh: '猴子', emoji: '🐵' },
-      { en: 'elephant', zh: '大象', emoji: '🐘' }, { en: 'lion', zh: '狮子', emoji: '🦁' }
+      { en: 'elephant', zh: '大象', emoji: '🐘' }, { en: 'lion', zh: '狮子', emoji: '🦁' },
+      { en: 'cow', zh: '奶牛', emoji: '🐮' }, { en: 'horse', zh: '马', emoji: '🐴' },
+      { en: 'sheep', zh: '绵羊', emoji: '🐑' }, { en: 'chicken', zh: '鸡', emoji: '🐔' },
+      { en: 'bear', zh: '熊', emoji: '🐻' }, { en: 'fox', zh: '狐狸', emoji: '🦊' },
+      { en: 'frog', zh: '青蛙', emoji: '🐸' }, { en: 'bee', zh: '蜜蜂', emoji: '🐝' }
     ],
     fruit: [
       { en: 'apple', zh: '苹果', emoji: '🍎' }, { en: 'banana', zh: '香蕉', emoji: '🍌' },
       { en: 'orange', zh: '橙子', emoji: '🍊' }, { en: 'pear', zh: '梨', emoji: '🍐' },
       { en: 'grape', zh: '葡萄', emoji: '🍇' }, { en: 'peach', zh: '桃子', emoji: '🍑' },
       { en: 'watermelon', zh: '西瓜', emoji: '🍉' }, { en: 'strawberry', zh: '草莓', emoji: '🍓' },
-      { en: 'lemon', zh: '柠檬', emoji: '🍋' }, { en: 'mango', zh: '芒果', emoji: '🥭' }
+      { en: 'lemon', zh: '柠檬', emoji: '🍋' }, { en: 'mango', zh: '芒果', emoji: '🥭' },
+      { en: 'cherry', zh: '樱桃', emoji: '🍒' }, { en: 'pineapple', zh: '菠萝', emoji: '🍍' },
+      { en: 'coconut', zh: '椰子', emoji: '🥥' }, { en: 'kiwi', zh: '猕猴桃', emoji: '🥝' },
+      { en: 'tomato', zh: '西红柿', emoji: '🍅' }, { en: 'grapefruit', zh: '柚子', emoji: '🍊' }
     ],
     number: [
       { en: 'one', zh: '一', emoji: '1️⃣' }, { en: 'two', zh: '二', emoji: '2️⃣' },
@@ -65,26 +72,35 @@
       { en: 'pen', zh: '钢笔', emoji: '🖊️' }, { en: 'pencil', zh: '铅笔', emoji: '✏️' },
       { en: 'book', zh: '书', emoji: '📖' }, { en: 'bag', zh: '书包', emoji: '🎒' },
       { en: 'ruler', zh: '尺子', emoji: '📏' }, { en: 'eraser', zh: '橡皮', emoji: '🧽' },
-      { en: 'crayon', zh: '蜡笔', emoji: '🖍️' }, { en: 'box', zh: '盒子', emoji: '📦' }
+      { en: 'crayon', zh: '蜡笔', emoji: '🖍️' }, { en: 'box', zh: '盒子', emoji: '📦' },
+      { en: 'notebook', zh: '笔记本', emoji: '📓' }, { en: 'scissors', zh: '剪刀', emoji: '✂️' },
+      { en: 'glue', zh: '胶水', emoji: '🩹' }, { en: 'brush', zh: '画笔', emoji: '🖌️' }
     ],
     body: [
       { en: 'head', zh: '头', emoji: '👤' }, { en: 'hand', zh: '手', emoji: '✋' },
       { en: 'eye', zh: '眼睛', emoji: '👁️' }, { en: 'ear', zh: '耳朵', emoji: '👂' },
       { en: 'nose', zh: '鼻子', emoji: '👃' }, { en: 'mouth', zh: '嘴', emoji: '👄' },
-      { en: 'foot', zh: '脚', emoji: '🦶' }, { en: 'leg', zh: '腿', emoji: '🦵' }
+      { en: 'foot', zh: '脚', emoji: '🦶' }, { en: 'leg', zh: '腿', emoji: '🦵' },
+      { en: 'hair', zh: '头发', emoji: '💇' }, { en: 'tooth', zh: '牙齿', emoji: '🦷' },
+      { en: 'arm', zh: '手臂', emoji: '💪' }, { en: 'face', zh: '脸', emoji: '😊' }
     ],
     family: [
       { en: 'father', zh: '爸爸', emoji: '👨' }, { en: 'mother', zh: '妈妈', emoji: '👩' },
       { en: 'brother', zh: '兄弟', emoji: '👦' }, { en: 'sister', zh: '姐妹', emoji: '👧' },
       { en: 'grandpa', zh: '爷爷', emoji: '👴' }, { en: 'grandma', zh: '奶奶', emoji: '👵' },
-      { en: 'baby', zh: '宝宝', emoji: '👶' }, { en: 'family', zh: '家庭', emoji: '👨‍👩‍👧' }
+      { en: 'baby', zh: '宝宝', emoji: '👶' }, { en: 'family', zh: '家庭', emoji: '👨‍👩‍👧' },
+      { en: 'uncle', zh: '叔叔', emoji: '🧔' }, { en: 'aunt', zh: '阿姨', emoji: '👩' },
+      { en: 'friend', zh: '朋友', emoji: '🧑‍🤝‍🧑' }, { en: 'cousin', zh: '表亲', emoji: '🧒' }
     ],
     food: [
       { en: 'rice', zh: '米饭', emoji: '🍚' }, { en: 'bread', zh: '面包', emoji: '🍞' },
       { en: 'egg', zh: '鸡蛋', emoji: '🥚' }, { en: 'milk', zh: '牛奶', emoji: '🥛' },
       { en: 'cake', zh: '蛋糕', emoji: '🍰' }, { en: 'noodles', zh: '面条', emoji: '🍜' },
       { en: 'fish', zh: '鱼', emoji: '🐟' }, { en: 'meat', zh: '肉', emoji: '🍖' },
-      { en: 'water', zh: '水', emoji: '💧' }, { en: 'juice', zh: '果汁', emoji: '🧃' }
+      { en: 'water', zh: '水', emoji: '💧' }, { en: 'juice', zh: '果汁', emoji: '🧃' },
+      { en: 'hamburger', zh: '汉堡', emoji: '🍔' }, { en: 'hot dog', zh: '热狗', emoji: '🌭' },
+      { en: 'chips', zh: '薯条', emoji: '🍟' }, { en: 'ice cream', zh: '冰淇淋', emoji: '🍦' },
+      { en: 'candy', zh: '糖果', emoji: '🍬' }, { en: 'cookie', zh: '饼干', emoji: '🍪' }
     ],
     // —— 三年级：玩具、交通、天气、动作 ——
     toy: [
@@ -136,7 +152,10 @@
       { en: 'swim', zh: '游泳', emoji: '🏊' }, { en: 'read', zh: '读', emoji: '📖' },
       { en: 'write', zh: '写', emoji: '✍️' }, { en: 'sing', zh: '唱歌', emoji: '🎤' },
       { en: 'dance', zh: '跳舞', emoji: '💃' }, { en: 'draw', zh: '画画', emoji: '🖌️' },
-      { en: 'eat', zh: '吃', emoji: '🍽️' }, { en: 'sleep', zh: '睡觉', emoji: '😴' }
+      { en: 'eat', zh: '吃', emoji: '🍽️' }, { en: 'sleep', zh: '睡觉', emoji: '😴' },
+      { en: 'walk', zh: '走', emoji: '🚶' }, { en: 'talk', zh: '说话', emoji: '🗣️' },
+      { en: 'play', zh: '玩', emoji: '🎮' }, { en: 'cook', zh: '做饭', emoji: '🍳' },
+      { en: 'fly', zh: '飞', emoji: '🕊️' }, { en: 'listen', zh: '听', emoji: '👂' }
     ],
     season: [
       { en: 'spring', zh: '春天', emoji: '🌸' }, { en: 'summer', zh: '夏天', emoji: '🌞' },
@@ -146,13 +165,50 @@
       { en: 'school', zh: '学校', emoji: '🏫' }, { en: 'home', zh: '家', emoji: '🏠' },
       { en: 'park', zh: '公园', emoji: '🏞️' }, { en: 'zoo', zh: '动物园', emoji: '🦓' },
       { en: 'hospital', zh: '医院', emoji: '🏥' }, { en: 'library', zh: '图书馆', emoji: '📚' },
-      { en: 'shop', zh: '商店', emoji: '🏪' }, { en: 'farm', zh: '农场', emoji: '🚜' }
+      { en: 'shop', zh: '商店', emoji: '🏪' }, { en: 'farm', zh: '农场', emoji: '🚜' },
+      { en: 'bank', zh: '银行', emoji: '🏦' }, { en: 'restaurant', zh: '餐厅', emoji: '🍽️' },
+      { en: 'cinema', zh: '电影院', emoji: '🎬' }, { en: 'museum', zh: '博物馆', emoji: '🏛️' }
     ],
     nature: [
       { en: 'sun', zh: '太阳', emoji: '☀️' }, { en: 'moon', zh: '月亮', emoji: '🌙' },
       { en: 'star', zh: '星星', emoji: '⭐' }, { en: 'tree', zh: '树', emoji: '🌳' },
       { en: 'flower', zh: '花', emoji: '🌷' }, { en: 'river', zh: '河', emoji: '🏞️' },
-      { en: 'mountain', zh: '山', emoji: '⛰️' }, { en: 'sky', zh: '天空', emoji: '🌌' }
+      { en: 'mountain', zh: '山', emoji: '⛰️' }, { en: 'sky', zh: '天空', emoji: '🌌' },
+      { en: 'sea', zh: '大海', emoji: '🌊' }, { en: 'cloud', zh: '云', emoji: '☁️' },
+      { en: 'rain', zh: '雨', emoji: '🌧️' }, { en: 'grass', zh: '草', emoji: '🌱' }
+    ],
+    // —— 新增主题 ——
+    month: [
+      { en: 'January', zh: '一月', emoji: '1️⃣' }, { en: 'February', zh: '二月', emoji: '2️⃣' },
+      { en: 'March', zh: '三月', emoji: '3️⃣' }, { en: 'April', zh: '四月', emoji: '4️⃣' },
+      { en: 'May', zh: '五月', emoji: '5️⃣' }, { en: 'June', zh: '六月', emoji: '6️⃣' },
+      { en: 'July', zh: '七月', emoji: '7️⃣' }, { en: 'August', zh: '八月', emoji: '8️⃣' },
+      { en: 'September', zh: '九月', emoji: '9️⃣' }, { en: 'October', zh: '十月', emoji: '🔟' },
+      { en: 'November', zh: '十一月', emoji: '🍂' }, { en: 'December', zh: '十二月', emoji: '🎄' }
+    ],
+    weekday: [
+      { en: 'Monday', zh: '星期一', emoji: '📅' }, { en: 'Tuesday', zh: '星期二', emoji: '📅' },
+      { en: 'Wednesday', zh: '星期三', emoji: '📅' }, { en: 'Thursday', zh: '星期四', emoji: '📅' },
+      { en: 'Friday', zh: '星期五', emoji: '📅' }, { en: 'Saturday', zh: '星期六', emoji: '🎉' },
+      { en: 'Sunday', zh: '星期日', emoji: '☀️' }
+    ],
+    feeling: [
+      { en: 'happy', zh: '高兴', emoji: '😄' }, { en: 'sad', zh: '难过', emoji: '😢' },
+      { en: 'angry', zh: '生气', emoji: '😠' }, { en: 'tired', zh: '累', emoji: '😫' },
+      { en: 'hungry', zh: '饿', emoji: '😋' }, { en: 'afraid', zh: '害怕', emoji: '😨' },
+      { en: 'excited', zh: '兴奋', emoji: '🤩' }, { en: 'sleepy', zh: '困', emoji: '😴' }
+    ],
+    drink: [
+      { en: 'tea', zh: '茶', emoji: '🍵' }, { en: 'coffee', zh: '咖啡', emoji: '☕' },
+      { en: 'water', zh: '水', emoji: '💧' }, { en: 'milk', zh: '牛奶', emoji: '🥛' },
+      { en: 'juice', zh: '果汁', emoji: '🧃' }, { en: 'cola', zh: '可乐', emoji: '🥤' },
+      { en: 'soup', zh: '汤', emoji: '🍲' }, { en: 'water', zh: '开水', emoji: '🚰' }
+    ],
+    sport: [
+      { en: 'football', zh: '足球', emoji: '⚽' }, { en: 'basketball', zh: '篮球', emoji: '🏀' },
+      { en: 'ping-pong', zh: '乒乓球', emoji: '🏓' }, { en: 'badminton', zh: '羽毛球', emoji: '🏸' },
+      { en: 'swimming', zh: '游泳', emoji: '🏊' }, { en: 'running', zh: '跑步', emoji: '🏃' },
+      { en: 'tennis', zh: '网球', emoji: '🎾' }, { en: 'skating', zh: '滑冰', emoji: '⛸️' }
     ]
   };
 
@@ -187,7 +243,18 @@
     { q: 'Happy birthday!', zh: '生日祝福', a: 'Thank you!', distractors: ['Good morning.', 'Sorry.', 'See you.'] },
     { q: "Let's go to school.", zh: '提议去上学', a: 'OK!', distractors: ["It's red.", 'A dog.', "I'm fine."] },
     { q: 'Do you like apples?', zh: '问你喜欢苹果吗', a: 'Yes, I do.', distractors: ["It's red.", 'My name is Tom.', 'Three.'] },
-    { q: 'What would you like?', zh: '问你想要什么', a: "I'd like some rice.", distractors: ["I'm fine.", "It's Monday.", 'Yes, I do.'] }
+    { q: 'What would you like?', zh: '问你想要什么', a: "I'd like some rice.", distractors: ["I'm fine.", "It's Monday.", 'Yes, I do.'] },
+    { q: 'What time is it?', zh: '问几点了', a: "It's seven o'clock.", distractors: ["It's Monday.", "It's red.", "I'm seven."] },
+    { q: 'How is the weather today?', zh: '问今天天气', a: "It's sunny.", distractors: ["It's a cat.", "I'm fine.", "It's a pen."] },
+    { q: 'Where are you from?', zh: '问你来自哪里', a: "I'm from China.", distractors: ["I'm nine.", "It's red.", 'Thank you.'] },
+    { q: 'Whose book is this?', zh: '问这是谁的书', a: "It's mine.", distractors: ["It's Monday.", "I'm fine.", 'Three.'] },
+    { q: 'Can you swim?', zh: '问你会游泳吗', a: 'Yes, I can.', distractors: ["It's red.", 'My name is Tom.', "It's Monday."] },
+    { q: 'What are you doing?', zh: '问你在做什么', a: "I'm reading a book.", distractors: ["I'm fine.", "It's red.", 'Yes, I am.'] },
+    { q: 'How much is the pen?', zh: '问钢笔多少钱', a: "It's five yuan.", distractors: ["It's Monday.", "I'm five.", "It's a pen."] },
+    { q: "What's your favourite fruit?", zh: '问你最爱吃的水果', a: 'I like apples.', distractors: ["I'm fine.", "It's Monday.", 'Yes, I do.'] },
+    { q: 'Are you OK?', zh: '关心地问你还好吗', a: "Yes, I'm OK.", distractors: ["It's red.", 'My name is Amy.', 'Monday.'] },
+    { q: 'See you tomorrow!', zh: '约定明天见', a: 'See you!', distractors: ['Good morning!', 'Thank you.', 'How old are you?'] },
+    { q: 'Excuse me.', zh: '想请别人让一下/引起注意', a: "Yes? Can I help you?", distractors: ['Good night.', "I'm ten.", "It's red."] }
   ];
 
   // ============ 生活情景对话库（贴合真实生活场景）============
@@ -213,7 +280,19 @@
     { g: 'high', scene: '🍽️ 在餐厅', ctx: 'The waiter asks: "Are you ready to order?"', zh: '服务员问你准备好点餐了吗', a: "Yes, I'd like some noodles.", distractors: ['No, I am hungry.', "It's delicious.", 'I am a waiter.'] },
     { g: 'high', scene: '🎒 丢东西', ctx: 'You lost your bag. You ask the guard for help.', zh: '你的书包丢了，向保安求助', a: "I can't find my bag.", distractors: ['My bag is nice.', 'I have a bag.', 'The bag is red.'] },
     { g: 'high', scene: '🏨 问洗手间', ctx: 'You are in a restaurant and need the washroom.', zh: '在餐厅想问洗手间在哪', a: 'Excuse me, where is the washroom?', distractors: ['How much is the washroom?', 'I like the washroom.', 'The washroom is nice.'] },
-    { g: 'high', scene: '🛍️ 买衣服', ctx: 'The shop assistant asks: "What size do you want?"', zh: '店员问你要多大尺码', a: "Size M, please.", distractors: ['I am fine, thanks.', "It's Monday.", 'You are welcome.'] }
+    { g: 'high', scene: '🛍️ 买衣服', ctx: 'The shop assistant asks: "What size do you want?"', zh: '店员问你要多大尺码', a: "Size M, please.", distractors: ['I am fine, thanks.', "It's Monday.", 'You are welcome.'] },
+    { g: 'low', scene: '🎈 分享', ctx: 'Your friend gives you a balloon.', zh: '朋友送你一个气球', a: 'Thank you!', distractors: ['Sorry.', 'Goodbye.', "I'm nine."] },
+    { g: 'low', scene: '🍬 想要糖', ctx: 'Mum asks: "Do you want some candy?"', zh: '妈妈问你要不要糖，你很想要', a: 'Yes, please!', distractors: ['No, I am.', "It's red.", 'Good night.'] },
+    { g: 'low', scene: '🚪 进教室', ctx: 'You are late. Before you go in, you should say...', zh: '上课迟到进教室前该说', a: 'May I come in?', distractors: ['Goodbye!', 'I like school.', "It's sunny."] },
+    { g: 'low', scene: '🧴 洗手', ctx: 'Before lunch, the teacher says wash your hands.', zh: '午饭前老师叫你洗手，你回答', a: 'OK, Miss Li.', distractors: ["It's red.", 'How much?', 'I am five.'] },
+    { g: 'mid', scene: '🎂 点蛋糕', ctx: 'At the bakery, you want a chocolate cake.', zh: '在蛋糕店想买巧克力蛋糕', a: 'I want a chocolate cake, please.', distractors: ['I am a cake.', "It's Monday.", 'How old are you?'] },
+    { g: 'mid', scene: '🚏 找车站', ctx: 'You want to find the bus stop.', zh: '你想问公交车站在哪', a: 'Where is the bus stop?', distractors: ['How are you?', 'What is this?', 'How many buses?'] },
+    { g: 'mid', scene: '📚 借书', ctx: 'At the library, you want to borrow this book.', zh: '在图书馆想借这本书', a: 'Can I borrow this book?', distractors: ['This book is red.', 'I like books.', 'How old is the book?'] },
+    { g: 'mid', scene: '🎡 问价格', ctx: 'At the park gate, you ask about the ticket.', zh: '在公园门口问门票多少钱', a: 'How much is the ticket?', distractors: ['I like the park.', 'The park is big.', 'What day is it?'] },
+    { g: 'high', scene: '📞 请假', ctx: 'You are ill. You call your teacher to ask for leave.', zh: '生病了，打电话向老师请假', a: "I'm ill, so I can't come to school today.", distractors: ['I like school.', 'The school is big.', 'How much is school?'] },
+    { g: 'high', scene: '🏪 退换', ctx: 'The shoes are too small. You go back to the shop.', zh: '鞋子太小，回店里想换', a: 'These shoes are too small. Can I change them?', distractors: ['I like shoes.', 'The shoes are red.', 'How old are the shoes?'] },
+    { g: 'high', scene: '🗺️ 指路', ctx: 'A tourist asks you the way to the station.', zh: '游客问你去车站怎么走', a: 'Go straight and turn left.', distractors: ["I'm fine, thank you.", "It's Monday.", 'I like the station.'] },
+    { g: 'high', scene: '🍜 加菜', ctx: 'The waiter asks if you want anything else.', zh: '服务员问还要别的吗', a: "No, thanks. That's all.", distractors: ['Yes, I am hungry.', 'I am a waiter.', "It's delicious."] }
   ];
 
   // 生活情景对话生成器：按年级档筛选，输出与 dialog() 同构的选择题
@@ -421,23 +500,23 @@
     en_g2_body: () => pick([wordPicToEn(['body']), wordEnToZh(['body'])]),
     en_g2_family: () => pick([wordZhToEn(['family']), wordEnToZh(['family'])]),
     en_g2_spell: () => spellWord(['color', 'animal', 'fruit', 'number']),
-    // 三年级：玩具/交通/天气 + 拼写 + 打招呼对话
-    en_g3_toy: () => pick([wordZhToEn(['toy']), wordEnToZh(['toy'])]),
-    en_g3_transport: () => pick([wordZhToEn(['transport']), wordEnToZh(['transport'])]),
+    // 三年级：玩具/交通/天气/运动 + 拼写 + 打招呼对话
+    en_g3_toy: () => pick([wordZhToEn(['toy']), wordEnToZh(['toy']), wordZhToEn(['sport']), wordEnToZh(['sport'])]),
+    en_g3_transport: () => pick([wordZhToEn(['transport']), wordEnToZh(['transport']), wordEnToZh(['weather'])]),
     en_g3_spell: () => spellWord(['stationery', 'body', 'family', 'food']),
     en_g3_dialog: () => dialog(),
     // 四年级：房间/衣服/职业/学科 + 拼写
     en_g4_room: () => pick([wordZhToEn(['room']), wordEnToZh(['room'])]),
     en_g4_clothes: () => pick([wordZhToEn(['clothes']), wordEnToZh(['clothes'])]),
-    en_g4_job: () => pick([wordZhToEn(['job']), wordEnToZh(['job'])]),
-    en_g4_spell: () => spellWord(['toy', 'transport', 'weather', 'room']),
-    // 五年级：动词/季节/地点 + 对话 + 语法入门
-    en_g5_verb: () => pick([wordZhToEn(['verb']), wordEnToZh(['verb'])]),
-    en_g5_place: () => pick([wordZhToEn(['place']), wordEnToZh(['place'])]),
+    en_g4_job: () => pick([wordZhToEn(['job']), wordEnToZh(['job']), wordEnToZh(['subject'])]),
+    en_g4_spell: () => spellWord(['toy', 'transport', 'weather', 'room', 'sport']),
+    // 五年级：动词/季节/地点/情绪 + 对话 + 语法入门
+    en_g5_verb: () => pick([wordZhToEn(['verb']), wordEnToZh(['verb']), wordEnToZh(['feeling'])]),
+    en_g5_place: () => pick([wordZhToEn(['place']), wordEnToZh(['place']), wordEnToZh(['drink'])]),
     en_g5_dialog: () => dialog(),
     en_g5_grammar: () => grammar(),
-    // 六年级：自然/学科混合 + 拼写 + 对话 + 语法综合
-    en_g6_nature: () => pick([wordZhToEn(['nature']), wordEnToZh(['nature'])]),
+    // 六年级：自然/月份星期/学科混合 + 拼写 + 对话 + 语法综合
+    en_g6_nature: () => pick([wordZhToEn(['nature']), wordEnToZh(['nature']), wordEnToZh(['month']), wordEnToZh(['weekday'])]),
     en_g6_spell: () => spellWord(['clothes', 'job', 'verb', 'place', 'nature']),
     en_g6_dialog: () => dialog(),
     en_g6_grammar: () => grammar(),

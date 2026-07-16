@@ -226,7 +226,10 @@
         () => { const a = randInt(3, 12), b = randInt(2, 8); return wq('小明有 ' + a + ' 颗糖🍬，妈妈又给了 ' + b + ' 颗，<br>现在一共有几颗糖？', a + b); },
         () => { const a = randInt(8, 18), b = randInt(2, a - 1); return wq('树上有 ' + a + ' 只小鸟🐦，飞走了 ' + b + ' 只，<br>还剩几只小鸟？', a - b); },
         () => { const a = randInt(3, 9), b = randInt(2, 8); return wq('停车场有 ' + a + ' 辆红色🚗和 ' + b + ' 辆蓝色🚙，<br>一共有几辆车？', a + b); },
-        () => { const a = randInt(10, 20), b = randInt(3, 9); return wq('小红有 ' + a + ' 支铅笔✏️，送给同学 ' + b + ' 支，<br>还剩几支？', a - b); }
+        () => { const a = randInt(10, 20), b = randInt(3, 9); return wq('小红有 ' + a + ' 支铅笔✏️，送给同学 ' + b + ' 支，<br>还剩几支？', a - b); },
+        () => { const a = randInt(5, 12), b = randInt(3, 8); return wq('鱼缸里有 ' + a + ' 条金鱼🐟，又放进 ' + b + ' 条，<br>现在有几条？', a + b); },
+        () => { const a = randInt(10, 19), b = randInt(3, 9); return wq('盘子里有 ' + a + ' 个饺子🥟，吃了 ' + b + ' 个，<br>还剩几个？', a - b); },
+        () => { const a = randInt(2, 7), b = randInt(2, 7), c = randInt(2, 6); return wq('小猫🐱钓了 ' + a + ' 条鱼，小狗钓了 ' + b + ' 条，小兔钓了 ' + c + ' 条，<br>三个一共几条？', a + b + c); }
       ];
       return pick(forms)();
     },
@@ -235,7 +238,10 @@
         () => { const a = randInt(3, 9), b = randInt(2, 9); return wq('每盒有 ' + a + ' 支彩笔🖍️，' + b + ' 盒一共有几支？', a * b); },
         () => { const a = randInt(30, 60), b = randInt(10, a - 5); return wq('果园摘了 ' + a + ' 个苹果🍎，卖掉 ' + b + ' 个，<br>还剩几个？', a - b); },
         () => { const a = randInt(2, 9), b = randInt(2, 9); return wq('一排有 ' + a + ' 个座位💺，' + b + ' 排一共几个座位？', a * b); },
-        () => { const a = randInt(15, 45), b = randInt(10, 40); return wq('班里有男生 ' + a + ' 人，女生 ' + b + ' 人，<br>全班一共几人？', a + b); }
+        () => { const a = randInt(15, 45), b = randInt(10, 40); return wq('班里有男生 ' + a + ' 人，女生 ' + b + ' 人，<br>全班一共几人？', a + b); },
+        () => { const per = randInt(2, 9); const n = randInt(2, 6); const total = per * n; return wq('' + total + ' 块糖🍬平均装进 ' + n + ' 个袋子，<br>每袋装几块？', per); },
+        () => { const a = randInt(2, 6), b = randInt(2, 5); return wq('一只手有 5 根手指✋，' + a + ' 只手一共几根手指？', a * 5); },
+        () => { const w = randInt(20, 50), s = randInt(5, w - 5); return wq('小明有 ' + w + ' 元💰，买文具花了 ' + s + ' 元，<br>还剩多少元？', w - s); }
       ];
       return pick(forms)();
     },
@@ -244,7 +250,10 @@
         () => { const box = randInt(3, 8), per = randInt(4, 9); return wq('书架每层放 ' + per + ' 本书📚，' + box + ' 层一共放几本？', box * per); },
         () => { const per = pick([2, 3, 4, 5, 6]); const q = randInt(3, 9); const g = per * q; return wq('有 ' + g + ' 块饼干🍪，平均分给 ' + per + ' 个小朋友，<br>每人分几块？', q); },
         () => { const a = randInt(120, 480), b = randInt(50, 200); return wq('图书馆上午借出 ' + a + ' 本书，下午又借出 ' + b + ' 本，<br>一共借出几本？', a + b); },
-        () => { const price = randInt(3, 9), n = randInt(3, 8); return wq('一个面包🍞 ' + price + ' 元，买 ' + n + ' 个要多少元？', price * n); }
+        () => { const price = randInt(3, 9), n = randInt(3, 8); return wq('一个面包🍞 ' + price + ' 元，买 ' + n + ' 个要多少元？', price * n); },
+        () => { const total = randInt(200, 600), s = randInt(50, 180); return wq('商店有 ' + total + ' 瓶饮料🥤，卖出 ' + s + ' 瓶，<br>还剩几瓶？', total - s); },
+        () => { const rows = randInt(4, 8), per = randInt(6, 9); return wq('操场上同学排队，每排 ' + per + ' 人，共 ' + rows + ' 排，<br>一共多少人？', rows * per); },
+        () => { const per = pick([6, 8, 10]); const boxes = randInt(3, 8); const g = per * boxes; return wq('' + g + ' 个鸡蛋🥚，每 ' + per + ' 个装一盒，<br>能装几盒？', boxes); }
       ];
       return pick(forms)();
     },
@@ -253,7 +262,10 @@
         () => { const per = randInt(5, 12), box = randInt(3, 6), eat = randInt(2, 8); return wq('每袋 ' + per + ' 颗巧克力🍫，买了 ' + box + ' 袋，<br>吃掉 ' + eat + ' 颗，还剩几颗？', per * box - eat); },
         () => { const per = pick([5, 10, 20]); const n = randInt(3, 8); const total = per * n; return wq('一共 ' + total + ' 元💰，每本笔记本 ' + per + ' 元，<br>能买几本？', n); },
         () => { const speed = randInt(40, 80), h = randInt(2, 5); return wq('汽车每小时行 ' + speed + ' 千米🚙，<br>行了 ' + h + ' 小时，一共行多少千米？', speed * h); },
-        () => { const a = randInt(3, 8), b = randInt(3, 8), c = randInt(2, 6); return wq('每排 ' + a + ' 棵树🌳，共 ' + b + ' 排，<br>又种了 ' + c + ' 棵，一共几棵？', a * b + c); }
+        () => { const a = randInt(3, 8), b = randInt(3, 8), c = randInt(2, 6); return wq('每排 ' + a + ' 棵树🌳，共 ' + b + ' 排，<br>又种了 ' + c + ' 棵，一共几棵？', a * b + c); },
+        () => { const a = randInt(20, 80), b = randInt(20, 80), total = a + b + randInt(10, 100); return wq('小明有 ' + total + ' 元，买书花 ' + a + ' 元，买笔花 ' + b + ' 元，<br>还剩多少元？', total - a - b); },
+        () => { const boxes = randInt(4, 9), per = randInt(6, 12), give = randInt(2, 5); return wq('' + boxes + ' 箱苹果🍎，每箱 ' + per + ' 个，<br>送人 ' + give + ' 个后还剩几个？', boxes * per - give); },
+        () => { const rows = randInt(6, 12), cols = randInt(6, 12); return wq('教室座位排成 ' + rows + ' 行 ' + cols + ' 列，<br>一共有多少个座位💺？', rows * cols); }
       ];
       return pick(forms)();
     },
@@ -261,7 +273,10 @@
       const forms = [
         () => { const price = (randInt(15, 45) / 10), n = randInt(2, 5); const ans = Math.round(price * n * 10) / 10; return wq('一支笔 ' + price.toFixed(1) + ' 元，买 ' + n + ' 支<br>一共多少元？（结果保留一位小数）', ans, 1); },
         () => { const avg = randInt(75, 95); const sum = avg * 3; return wq('三次考试平均分 ' + avg + ' 分，<br>三次的总分是多少分？', sum); },
-        () => { const w = (randInt(20, 50) / 10), n = randInt(3, 6); const ans = Math.round(w * n * 10) / 10; return wq('每袋米重 ' + w.toFixed(1) + ' 千克，' + n + ' 袋<br>一共重多少千克？（保留一位小数）', ans, 1); }
+        () => { const w = (randInt(20, 50) / 10), n = randInt(3, 6); const ans = Math.round(w * n * 10) / 10; return wq('每袋米重 ' + w.toFixed(1) + ' 千克，' + n + ' 袋<br>一共重多少千克？（保留一位小数）', ans, 1); },
+        () => { const sum = randInt(60, 95) + randInt(60, 95) + randInt(60, 95) + randInt(60, 95); const avg = Math.round(sum / 4 * 10) / 10; return wq('四位同学身高加起来共 ' + sum + ' 厘米，<br>平均每人多高？（保留一位小数）', avg, 1); },
+        () => { const b = (randInt(10, 30) / 10); const a = b + (randInt(10, 40) / 10); const aa = Math.round(a * 10) / 10; const ans = Math.round((aa - b) * 10) / 10; return wq('一根绳子长 ' + aa.toFixed(1) + ' 米，剪去 ' + b.toFixed(1) + ' 米，<br>还剩多少米？（保留一位小数）', ans, 1); },
+        () => { const total = randInt(3, 8); const each = pick([2, 4, 5]); const money = total * each; return wq('买 ' + total + ' 个练习本共 ' + money + ' 元，<br>每个练习本多少元？', each); }
       ];
       return pick(forms)();
     },
@@ -269,7 +284,10 @@
       const forms = [
         () => { const total = randInt(3, 10) * 20, pct = pick([10, 20, 25, 50]); return wq('一本书共 ' + total + ' 页📖，已经读了 ' + pct + '%，<br>读了多少页？', total * pct / 100); },
         () => { const total = randInt(3, 8) * 12, frac = pick([[1, 2], [1, 3], [1, 4], [2, 3]]); const ans = total * frac[0] / frac[1]; return wq('果园有 ' + total + ' 棵果树🌳，其中 ' + frac[0] + '/' + frac[1] + ' 是苹果树，<br>苹果树有几棵？', ans); },
-        () => { const price = randInt(5, 20) * 10, off = pick([10, 20, 30]); return wq('一件衣服👕原价 ' + price + ' 元，<br>打 ' + (100 - off) + ' 折后便宜了多少元？', price * off / 100); }
+        () => { const price = randInt(5, 20) * 10, off = pick([10, 20, 30]); return wq('一件衣服👕原价 ' + price + ' 元，<br>打 ' + (100 - off) + ' 折后便宜了多少元？', price * off / 100); },
+        () => { const total = randInt(4, 10) * 25; const pct = pick([20, 40, 60, 80]); return wq('班里有 ' + total + ' 名同学，' + pct + '% 参加了合唱🎵，<br>参加合唱的有几人？', total * pct / 100); },
+        () => { const base = randInt(2, 6) * 10; const up = pick([10, 20, 50]); return wq('一件玩具🧸原价 ' + base + ' 元，涨价 ' + up + '%，<br>现在多少元？', base * (100 + up) / 100); },
+        () => { const frac = pick([[3, 5], [3, 4], [2, 5]]); const total = randInt(3, 9) * frac[1]; const ans = total * frac[0] / frac[1]; return wq('一桶水 ' + total + ' 升，用去了 ' + frac[0] + '/' + frac[1] + '，<br>用去多少升？', ans); }
       ];
       return pick(forms)();
     },
@@ -304,8 +322,67 @@
         () => { const a = randInt(3, 12), b = randInt(3, 12); return kqShape('长方形长 ' + a + ' 厘米，宽 ' + b + ' 厘米，<br>面积是多少平方厘米？', a * b); }
       ];
       return pick(forms)();
+    },
+
+    // ===== 找规律（填下一个数，keypad）=====
+    pattern_g1() { // 低年级：等差 +1~+3 / 翻倍 / 隔项
+      const forms = [
+        () => { const s = randInt(1, 5), d = randInt(1, 3); const arr = [s, s + d, s + 2 * d, s + 3 * d]; return kqPattern(arr, arr[3] + d); },
+        () => { const d = randInt(1, 3); const s = randInt(4 * d + 1, 20); const arr = [s, s - d, s - 2 * d, s - 3 * d]; return kqPattern(arr, arr[3] - d); },
+        () => { const s = randInt(1, 3); const arr = [s, s * 2, s * 4, s * 8]; return kqPattern(arr, arr[3] * 2); },
+        () => { const s = randInt(2, 6); const arr = [s, s + 2, s + 4, s + 6]; return kqPattern(arr, arr[3] + 2); }
+      ];
+      return pick(forms)();
+    },
+    pattern_g2() { // 中高年级：等差大步 / 平方 / 累加
+      const forms = [
+        () => { const s = randInt(2, 9), d = pick([3, 4, 5, 10]); const arr = [s, s + d, s + 2 * d, s + 3 * d]; return kqPattern(arr, arr[3] + d); },
+        () => { const arr = [1, 4, 9, 16]; return kqPattern(arr, 25); },
+        () => { const arr = [1, 2, 4, 8]; return kqPattern(arr, 16); },
+        () => { const s = randInt(1, 4); const arr = [s, s + 1, s + 3, s + 6]; return kqPattern(arr, s + 10); }, // 差 +1,+2,+3,+4
+        () => { const arr = [2, 6, 18, 54]; return kqPattern(arr, 162); } // ×3
+      ];
+      return pick(forms)();
+    },
+
+    // ===== 单位换算（keypad）=====
+    unit_g1() { // 长度/时间/人民币基础换算
+      const forms = [
+        () => { const m = randInt(1, 9); return wq('' + m + ' 米 = 多少厘米？<br>（1 米 = 100 厘米）', m * 100); },
+        () => { const h = randInt(1, 6); return wq('' + h + ' 小时 = 多少分钟？<br>（1 小时 = 60 分钟）', h * 60); },
+        () => { const y = randInt(2, 9); return wq('' + y + ' 元 = 多少角？<br>（1 元 = 10 角）', y * 10); },
+        () => { const kg = randInt(2, 9); return wq('' + kg + ' 千克 = 多少克？<br>（1 千克 = 1000 克）', kg * 1000); },
+        () => { const dm = randInt(2, 9); return wq('' + dm + ' 分米 = 多少厘米？<br>（1 分米 = 10 厘米）', dm * 10); }
+      ];
+      return pick(forms)();
+    },
+
+    // ===== 时间计算（keypad，答案为分钟或小时）=====
+    time_g1() {
+      const forms = [
+        () => { const start = randInt(1, 6), dur = randInt(1, 4); return wq('现在是 ' + start + ' 点🕐，再过 ' + dur + ' 小时是几点？<br>（填几点，用数字）', start + dur); },
+        () => { const a = randInt(10, 40), b = randInt(5, 20); return wq('看书用了 ' + a + ' 分钟，做操用了 ' + b + ' 分钟，<br>一共用了多少分钟？', a + b); },
+        () => { const total = randInt(40, 90), used = randInt(10, 30); return wq('一节课加课间共 ' + total + ' 分钟，上课 ' + used + ' 分钟🔔，<br>课间休息多少分钟？', total - used); }
+      ];
+      return pick(forms)();
+    },
+
+    // ===== 人民币购物（keypad，答案为元，整数）=====
+    money_g1() {
+      const forms = [
+        () => { const p = randInt(2, 9), n = randInt(2, 5); return wq('一支冰棍🍦 ' + p + ' 元，买 ' + n + ' 支要多少元？', p * n); },
+        () => { const give = randInt(20, 50), cost = randInt(5, give - 3); return wq('给了 ' + give + ' 元，买东西花了 ' + cost + ' 元，<br>应找回多少元？💰', give - cost); },
+        () => { const a = randInt(3, 12), b = randInt(3, 12); return wq('买铅笔花 ' + a + ' 元，买本子花 ' + b + ' 元，<br>一共花多少元？', a + b); }
+      ];
+      return pick(forms)();
     }
   };
+
+  // 找规律构造器：展示前 4 个数 + ?，答下一个
+  function kqPattern(arr, answer) {
+    const shown = arr.join('， ') + '， <b>?</b>';
+    return { text: '找规律，问号处填几？<br><span class="shape-art">' + shown + '</span>', answer: Number(answer), inputMode: 'keypad', decimals: 0, sec: 35 };
+  }
 
   // 应用题构造器：keypad，带 40 秒建议时长；decimals 可选
   function wq(text, answer, decimals) {

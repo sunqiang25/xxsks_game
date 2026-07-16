@@ -15,7 +15,9 @@
         { id: 'w1l3', name: '20以内进位加', type: 'add20', count: 10, emoji: '⭐' },
         { id: 'w1l4', name: '20以内退位减', type: 'sub20', count: 10, emoji: '🌟' },
         { id: 'w1l5', name: '数图形', type: 'shape_g1', count: 8, emoji: '🔺' },
-        { id: 'w1l6', name: '应用题', type: 'word_g1', count: 8, emoji: '🧠' }
+        { id: 'w1l6', name: '应用题', type: 'word_g1', count: 8, emoji: '🧠' },
+        { id: 'w1l7', name: '找规律', type: 'pattern_g1', count: 8, emoji: '🔢' },
+        { id: 'w1l8', name: '认识人民币', type: 'money_g1', count: 8, emoji: '💰' }
       ]
     },
     {
@@ -27,7 +29,9 @@
         { id: 'w2l3', name: '乘法口诀', type: 'mulTable', count: 12, emoji: '✖️' },
         { id: 'w2l4', name: '表内除法', type: 'divTable', count: 12, emoji: '➗' },
         { id: 'w2l5', name: '认识图形', type: 'shape_g2', count: 8, emoji: '📐' },
-        { id: 'w2l6', name: '应用题', type: 'word_g2', count: 8, emoji: '🧠' }
+        { id: 'w2l6', name: '应用题', type: 'word_g2', count: 8, emoji: '🧠' },
+        { id: 'w2l7', name: '单位换算', type: 'unit_g1', count: 8, emoji: '📏' },
+        { id: 'w2l8', name: '时间与钟表', type: 'time_g1', count: 8, emoji: '🕐' }
       ]
     },
     {
@@ -38,7 +42,8 @@
         { id: 'w3l2', name: '一位×两位数', type: 'mul1by2', count: 10, emoji: '⚡' },
         { id: 'w3l3', name: '除以一位数', type: 'divExact3', count: 10, emoji: '🌩️' },
         { id: 'w3l4', name: '周长面积', type: 'shape_g3', count: 8, emoji: '📐' },
-        { id: 'w3l5', name: '应用题', type: 'word_g3', count: 8, emoji: '🧠' }
+        { id: 'w3l5', name: '应用题', type: 'word_g3', count: 8, emoji: '🧠' },
+        { id: 'w3l6', name: '找规律', type: 'pattern_g2', count: 8, emoji: '🔢' }
       ]
     },
     {
