@@ -653,3 +653,31 @@ body::before {
 .welcome-card p { color: var(--text); font-size: 15px; line-height: 1.7; margin-bottom: 8px; }
 .welcome-card .welcome-sub { color: var(--muted); font-size: 14px; }
 .welcome-btns { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+
+/* 结算页：这关没拿到新金币的温和提示 */
+.coin-none {
+  margin: 12px auto; padding: 10px 14px; max-width: 320px;
+  background: rgba(255,255,255,0.06); border: 1px dashed var(--card-border);
+  border-radius: 14px; color: var(--muted); font-size: 13px; line-height: 1.6;
+}
+
+/* 存档备份 / 恢复 */
+.backup-card { max-width: 460px; text-align: left; }
+.backup-card h1 { text-align: center; }
+.backup-tip { color: var(--muted); font-size: 14px; line-height: 1.7; text-align: center; margin-bottom: 16px; }
+.backup-tip b { color: var(--accent); }
+.backup-block {
+  background: rgba(255,255,255,0.05); border: 1px solid var(--card-border);
+  border-radius: 16px; padding: 14px; margin-bottom: 14px;
+}
+.backup-label { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+.backup-text {
+  width: 100%; resize: vertical; font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 12px; line-height: 1.5; padding: 10px 12px; border-radius: 12px;
+  border: 1px solid var(--card-border); background: rgba(0,0,0,0.25); color: var(--text);
+  word-break: break-all; margin-bottom: 10px;
+}
+.backup-text:focus { outline: 2px solid var(--accent2); }
+.backup-block .btn { width: 100%; }
+.backup-warn { color: var(--no); font-size: 12px; margin-top: 8px; text-align: center; }
+

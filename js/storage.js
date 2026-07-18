@@ -109,8 +109,28 @@
     return sub(subjectId).levels[levelId] || { stars: 0, best: 0, fast: false, plays: 0 };
   }
 
+  // 从关卡 id 推年级序号(1-6)：id 形如 w3l2 / ylw3l2 / nsw3l2，取字母 w 后、l 前的数字
+  function gradeOf(levelId) {
+    const m = String(levelId).match(/w(\d+)l\d+/);
+    const g = m ? parseInt(m[1], 10) : 1;
+    return Math.min(6, Math.max(1, g));
+  }
+
+  // 金币公式：星级基数 × 年级系数 × 难度系数。只在“刷新纪录”(首通或星级提升)时发币，重玩无进步 0 币。
+  //  - 星级基数：1★=5 / 2★=10 / 3★=20
+  //  - 年级系数：一年级 1.0，每升一级 +0.2，六年级 2.0
+  //  - 难度系数：easy 0.8 / std 1.0 / hard 1.5（选难的鼓励，多给）
+  function coinFor(levelId, stars, difficulty) {
+    if (stars < 1) return 0;
+    const STAR_BASE = { 1: 5, 2: 10, 3: 20 };
+    const gradeMult = 1.0 + (gradeOf(levelId) - 1) * 0.2;
+    const DIFF_MULT = { easy: 0.8, std: 1.0, hard: 1.5 };
+    const diffMult = DIFF_MULT[difficulty] || 1.0;
+    return Math.max(1, Math.round((STAR_BASE[stars] || 0) * gradeMult * diffMult));
+  }
+
   // 记录一次通关结果
-  function recordResult(subjectId, levelId, type, correct, total, avgSec) {
+  function recordResult(subjectId, levelId, type, correct, total, avgSec, difficulty) {
     const S = global.Subjects.get(subjectId);
     const accuracy = total > 0 ? correct / total : 0;
     const stars = S.starsFor(accuracy);
@@ -127,12 +147,11 @@
     const improved = stars > prev.stars || score > prev.best;
     sub(subjectId).levels[levelId] = rec;
 
-    // ---- 金币奖励：首次达到某星级给大额，重玩只给安慰奖 ----
-    const COIN_BY_STAR = { 1: 10, 2: 20, 3: 40 };
+    // ---- 金币奖励：只在“刷新星级纪录”时按 星级×年级×难度 发币，重玩无进步 = 0 币（杜绝刷简单题攒币）----
     let coinsEarned = 0;
-    if (stars >= 1) {
-      const firstReach = prev.plays === 0 || stars > prev.stars; // 首次通关或星级提升
-      coinsEarned = firstReach ? (COIN_BY_STAR[stars] || 0) : 2;  // 重玩安慰奖 2
+    const brokeRecord = stars >= 1 && (prev.plays === 0 || stars > prev.stars); // 首通 或 星级提升
+    if (brokeRecord) {
+      coinsEarned = coinFor(levelId, stars, difficulty);
       state.coins = (state.coins || 0) + coinsEarned;
     }
 
@@ -145,7 +164,11 @@
 
     const newBadges = checkBadges(subjectId);
     save();
-    return { newStars: stars, storedStars: rec.stars, improved: improved, newBadges: newBadges, fast: rec.fast, coinsEarned: coinsEarned };
+    return {
+      newStars: stars, storedStars: rec.stars, improved: improved,
+      newBadges: newBadges, fast: rec.fast, coinsEarned: coinsEarned,
+      replayNoCoin: stars >= 1 && !brokeRecord // 通关了但没刷新纪录、没发币
+    };
   }
 
   // ---------- 星数统计（按科目） ----------
@@ -246,6 +269,31 @@
     save();
   }
 
+  // ---------- 存档备份/恢复（防换设备、防浏览器清缓存丢进度）----------
+  // 导出：把整个存档编码成一串“存档码”（Base64，家长可复制保存）
+  function exportSave() {
+    try {
+      const json = JSON.stringify(state);
+      // encodeURIComponent 先处理中文，再 btoa 转 Base64
+      return 'XXSKS1' + btoa(unescape(encodeURIComponent(json)));
+    } catch (e) { return ''; }
+  }
+  // 导入：粘回存档码，成功则覆盖当前进度并返回 true
+  function importSave(code) {
+    try {
+      const raw = String(code || '').trim();
+      if (raw.indexOf('XXSKS1') !== 0) return false;
+      const json = decodeURIComponent(escape(atob(raw.slice(6))));
+      const data = JSON.parse(json);
+      if (!data || typeof data !== 'object') return false;
+      // 走一遍 migrate + 字段补全，保证结构安全
+      const migrated = migrate(data);
+      localStorage.setItem(KEY, JSON.stringify(migrated));
+      state = load();
+      return true;
+    } catch (e) { return false; }
+  }
+
   // 清空：可指定科目，不传则全清
   function reset(subjectId) {
     if (subjectId) {
@@ -278,6 +326,8 @@
     setWishes: setWishes,
     getRedeemed: getRedeemed,
     pushRedeemed: pushRedeemed,
+    exportSave: exportSave,
+    importSave: importSave,
     reset: reset
   };
 })(window);

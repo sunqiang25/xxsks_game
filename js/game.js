@@ -632,7 +632,7 @@
     const accuracy = s.correct / total;
     const elapsed = (performance.now() - s.startAt) / 1000;
     const avgSec = elapsed / total;
-    const result = Store.recordResult(s.subjectId, s.level.id, s.level.type, s.correct, total, avgSec);
+    const result = Store.recordResult(s.subjectId, s.level.id, s.level.type, s.correct, total, avgSec, s.difficulty);
     const stars = result.newStars;
 
     if (stars >= 1) Sound.SFX.win(); else Sound.SFX.wrong();
@@ -656,7 +656,9 @@
 
     const coinHtml = result.coinsEarned
       ? '<div class="coin-earned pop">🪙 +' + result.coinsEarned + ' 金币！<span class="coin-total">（共 ' + Store.getCoins() + '）</span></div>'
-      : '';
+      : (result.replayNoCoin
+          ? '<div class="coin-none">🪙 这关已拿过金币啦～<br>拿到更多星星或挑战更高年级/难度才有新金币哦！</div>'
+          : '');
 
     show(
       '<div class="screen center">' +
@@ -958,6 +960,7 @@
             '<button class="btn" id="mHelp">❓ 玩法教程 & 攻略</button>' +
             '<button class="btn" id="mSound">' + (Store.get().settings.sound ? '🔊 音效：开' : '🔇 音效：关') + '</button>' +
             '<button class="btn" id="mBadges">🏅 查看徽章墙</button>' +
+            '<button class="btn" id="mBackup">💾 存档备份 / 恢复</button>' +
             '<button class="btn" id="mResetSub">🧹 清空本科目进度</button>' +
             '<button class="btn danger" id="mReset">🗑️ 清空全部进度</button>' +
           '</div>' +
@@ -973,6 +976,7 @@
       $('#mSound').textContent = Store.get().settings.sound ? '🔊 音效：开' : '🔇 音效：关';
     });
     $('#mBadges').addEventListener('click', () => { Sound.SFX.click(); renderBadges(); });
+    $('#mBackup').addEventListener('click', () => { Sound.SFX.click(); renderBackup(); });
     $('#mResetSub').addEventListener('click', () => {
       const name = Subjects.get(curSubject).name;
       if (confirm('确定清空【' + name + '】的全部进度和徽章吗？此操作无法撤销！')) {
@@ -988,6 +992,55 @@
     });
     $('#mBack').addEventListener('click', () => { Sound.SFX.click(); renderMap(); });
   }
+
+  // ================= 存档备份 / 恢复 =================
+  function renderBackup() {
+    const code = Store.exportSave();
+    show(
+      '<div class="screen center">' +
+        '<div class="intro-card pop backup-card">' +
+          '<h1>💾 存档备份 / 恢复</h1>' +
+          '<p class="backup-tip">换手机、清了浏览器、或进度丢了，用这里找回。<br><b>建议家长把存档码复制保存好。</b></p>' +
+          '<div class="backup-block">' +
+            '<div class="backup-label">📤 我的存档码（复制保存）</div>' +
+            '<textarea id="bkOut" class="backup-text" readonly rows="4">' + code + '</textarea>' +
+            '<button class="btn primary" id="bkCopy">📋 复制存档码</button>' +
+          '</div>' +
+          '<div class="backup-block">' +
+            '<div class="backup-label">📥 恢复存档（粘贴存档码）</div>' +
+            '<textarea id="bkIn" class="backup-text" rows="4" placeholder="把之前保存的存档码粘到这里…"></textarea>' +
+            '<button class="btn" id="bkImport">✅ 恢复这份存档</button>' +
+            '<p class="backup-warn">⚠️ 恢复会覆盖当前进度，请确认存档码正确。</p>' +
+          '</div>' +
+          '<button class="btn ghost" id="bkBack">返回</button>' +
+        '</div>' +
+      '</div>'
+    );
+    $('#bkCopy').addEventListener('click', () => {
+      const ta = $('#bkOut');
+      ta.select(); ta.setSelectionRange(0, 99999);
+      let ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+      if (navigator.clipboard) { navigator.clipboard.writeText(ta.value).catch(() => {}); ok = true; }
+      Sound.SFX.click();
+      toast(ok ? '📋 已复制！请粘贴到备忘录保存好' : '请长按选中后手动复制');
+    });
+    $('#bkImport').addEventListener('click', () => {
+      const val = $('#bkIn').value.trim();
+      if (!val) { toast('请先粘贴存档码'); return; }
+      if (!confirm('恢复存档会覆盖当前所有进度和金币，确定吗？')) return;
+      if (Store.importSave(val)) {
+        Sound.SFX.win();
+        toast('🎉 存档恢复成功！');
+        setTimeout(() => renderHome(), 800);
+      } else {
+        Sound.SFX.wrong();
+        toast('❌ 存档码无效，请检查是否复制完整');
+      }
+    });
+    $('#bkBack').addEventListener('click', () => { Sound.SFX.click(); renderMenu(); });
+  }
+
   function toggleSoundSilent() {
     const cur = Store.get().settings.sound;
     Store.setSetting('sound', !cur);
